@@ -10,8 +10,12 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root  = join(dirname(fileURLToPath(import.meta.url)), "..");
-const src   = readFileSync(join(root, "src/app/subagents.js"), "utf8");
+// i18n.js loads first: src/app/subagents.js destructures window.OMP_I18N at
+// its IIFE top level (a bare win resolves to the "en" identity path).
 const win   = {};
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
+const src   = readFileSync(join(root, "src/app/subagents.js"), "utf8");
 // eslint-disable-next-line no-new-func
 new Function("window", src)(win);
 const S = win.OMP_SUBAGENTS;

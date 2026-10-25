@@ -51,22 +51,22 @@ const CompactRow = React.memo(function CompactRow({ msg }) {
             color: COLOR,
             background: `color-mix(in oklab, ${COLOR} 14%, transparent)`,
             borderColor: `color-mix(in oklab, ${COLOR} 30%, var(--line))`,
-          }}>compact</span>
+          }}>{tr("compact")}</span>
           <span className="tool-title">
-            {pending ? "compacting context\u2026"
-              : error   ? "compaction failed"
-              : (msg.shortSummary || "context compacted")}
+            {pending ? tr("compacting context\u2026")
+              : error   ? tr("compaction failed")
+              : (msg.shortSummary || tr("context compacted"))}
           </span>
           <div className="tool-card-spacer" />
           {pending && (
             <span className="chip accent" style={{ animation: "pulseDot 1.4s infinite" }}>
-              <span className="dot live" />{" "}running
+              <span className="dot live" />{" "}{tr("running")}
             </span>
           )}
           {!pending && !error && msg.tokensBefore != null && (
-            <span className="chip muted mono">{tok} before</span>
+            <span className="chip muted mono">{tr("{n} before", { n: tok })}</span>
           )}
-          {error && <span className="chip" style={{ color: "var(--rose)" }}>failed</span>}
+          {error && <span className="chip" style={{ color: "var(--rose)" }}>{tr("failed")}</span>}
           {hasBody && <_CV_Icon name={open ? "chev" : "chevR"} size={10} color="var(--fg-4)" />}
         </div>
         {open && hasBody && (
@@ -99,9 +99,9 @@ const JobRow = React.memo(function JobRow({ msg, idx, highlighted }) {
             color,
             background: `color-mix(in oklab, ${color} 14%, transparent)`,
             borderColor: `color-mix(in oklab, ${color} 30%, var(--line))`,
-          }}>{label}</span>
+          }}>{tr(label)}</span>
           <span className="tool-title" title={msg.label ?? undefined}>
-            {msg.jobId} finished
+            {tr("{id} finished", { id: msg.jobId })}
             {msg.label && <span className="job-label"> · {msg.label}</span>}
           </span>
           <div className="tool-card-spacer" />
@@ -246,7 +246,7 @@ function ChatView({ messages, planMode, annotations, onAnnotate, hoveredMsgIdx, 
       {showJump && (
         <button type="button" className="chat-jump-latest" onClick={jumpToLatest}>
           <_CV_Icon name="chev" size={12} />
-          Jump to latest
+          {tr("Jump to latest")}
         </button>
       )}
     </div>

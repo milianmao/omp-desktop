@@ -17,6 +17,8 @@ import vm from "node:vm";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ctx = vm.createContext({ console });
 ctx.window = ctx;
+// adapter.js destructures OMP_I18N at load (translation layer first).
+vm.runInContext(readFileSync(join(root, "src", "app", "i18n.js"), "utf8"), ctx, { filename: "app/i18n.js" });
 vm.runInContext(readFileSync(join(root, "src", "adapter.js"), "utf8"), ctx, { filename: "adapter.js" });
 const { buildToolStartCard, finalizeToolCard } = ctx;
 

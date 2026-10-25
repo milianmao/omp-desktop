@@ -21,10 +21,10 @@ const TreeFmt = {
   /** `<1 min`, `14 min`, `1 h 5 min`, `2 h`. */
   dur(ms) {
     const min = Math.floor(Math.max(0, ms) / 60000);
-    if (min < 1) return "<1 min";
-    if (min < 60) return `${min} min`;
+    if (min < 1) return tr("<1 min");
+    if (min < 60) return tr("{n} min", { n: min });
     const h = Math.floor(min / 60), m = min % 60;
-    return m ? `${h} h ${m} min` : `${h} h`;
+    return m ? tr("{h} h {m} min", { h, m }) : tr("{h} h", { h });
   },
   /** `10:43` for today, `Oct 3, 10:43` for another day. */
   when(ts, now) {
@@ -42,8 +42,9 @@ const TreeFmt = {
   },
   /** Why a `staleProcess` row/tip cannot reuse its cache (tooltip + detail line). */
   staleNote(since, now) {
-    const started = since != null ? ` This tab's process started at ${TreeFmt.when(since, now)}, and a` : " A";
-    return `Cached by an earlier omp process of this conversation.${started} new process rebuilds the system prompt (e.g. recalled memories), so that cache cannot be reused.`;
+    return since != null
+      ? tr("Cached by an earlier omp process of this conversation. This tab's process started at {when}, and a new process rebuilds the system prompt (e.g. recalled memories), so that cache cannot be reused.", { when: TreeFmt.when(since, now) })
+      : tr("Cached by an earlier omp process of this conversation. A new process rebuilds the system prompt (e.g. recalled memories), so that cache cannot be reused.");
   },
 };
 
@@ -109,25 +110,25 @@ function TreeMeter({ row, ttlMs, now }) {
   const left = row.until != null ? row.until - now : null;
   const priced = row.price != null;
   const amount = priced ? TreeFmt.price(row.price)
-    : row.prefixTokens > 0 ? `${TreeFmt.tokens(row.prefixTokens)} tok` : "—";
+    : row.prefixTokens > 0 ? tr("{n} tok", { n: TreeFmt.tokens(row.prefixTokens) }) : "—";
   let label, bar = null, priceClass;
   if (_CTR_isLive(row.state)) {
-    label = `${row.state === "warm" ? "cached" : "expires"} · ${TreeFmt.dur(left ?? 0)}`;
+    label = row.state === "warm" ? tr("cached · {dur}", { dur: TreeFmt.dur(left ?? 0) }) : tr("expires · {dur}", { dur: TreeFmt.dur(left ?? 0) });
     const pct = ttlMs ? Math.min(100, Math.max(3, ((left ?? 0) / ttlMs) * 100)) : 0;
     bar = <div className="cache-bar"><span style={{ width: `${pct}%` }} /></div>;
     priceClass = "read";
   } else if (row.state === "partial") {
     const total = row.readTokens + row.writeTokens;
     const pct = total > 0 ? Math.round((row.readTokens / total) * 100) : 0;
-    label = `${pct} % cached`;
+    label = tr("{n} % cached", { n: pct });
     bar = <div className="cache-bar split"><span style={{ width: `${pct}%` }} /></div>;
     priceClass = "part";
   } else if (row.state === "cold") {
     // A stale row carries its own "earlier process" tag; the meter stays short.
-    label = row.until != null ? `cold · since ${TreeFmt.when(row.until, now)}` : "cold";
+    label = row.until != null ? tr("cold · since {when}", { when: TreeFmt.when(row.until, now) }) : tr("cold");
     priceClass = "write";
   } else {
-    label = "cache unknown";
+    label = tr("cache unknown");
     priceClass = "";
   }
   return (
@@ -144,40 +145,40 @@ function treeTags(row, model, now, since, currentFile, onOpenTip) {
   const tags = [];
   if (row.isAnchor) {
     tags.push(<span key="anchor" className="tree-tip anchor"
-      title="omp re-marks every 15th prompt on each request, so the cache up to here stays alive while you work">
-      ⚓ cache anchor · prompt {row.ordinal}
+      title={tr("omp re-marks every 15th prompt on each request, so the cache up to here stays alive while you work")}>
+      {tr("⚓ cache anchor · prompt {n}", { n: row.ordinal })}
     </span>);
   }
   if (row.state === "partial") {
     tags.push(<span key="partial" className="tree-tip partial">
-      reads up to prompt {row.anchorOrdinal}, writes the rest
+      {tr("reads up to prompt {n}, writes the rest", { n: row.anchorOrdinal })}
     </span>);
   }
   if (row.staleProcess || row.tipIndexes.some(i => model.tips[i]?.staleProcess)) {
-    tags.push(<span key="stale" className="tree-tip stale" title={TreeFmt.staleNote(since, now)}>earlier process</span>);
+    tags.push(<span key="stale" className="tree-tip stale" title={TreeFmt.staleNote(since, now)}>{tr("earlier process")}</span>);
   }
   if (row.label) tags.push(<span key="label" className="tree-tip label" title={row.label}>{row.label}</span>);
   for (const i of row.tipIndexes) {
     const tip = model.tips[i];
     if (!tip) continue;
     if (tip.isCurrent) {
-      tags.push(<span key={`tip${i}`} className="tree-tip here">this tab</span>);
+      tags.push(<span key={`tip${i}`} className="tree-tip here">{tr("this tab")}</span>);
       if (_CTR_isLive(tip.state)) {
         tags.push(<span key={`cont${i}`} className={`tree-cont ${tip.state}`}>
-          ▸ continue · cached {TreeFmt.dur((tip.until ?? now) - now)}
+          {tr("▸ continue · cached {dur}", { dur: TreeFmt.dur((tip.until ?? now) - now) })}
         </span>);
       } else if (tip.state === "cold") {
-        tags.push(<span key={`cont${i}`} className="tree-cont cold">▸ continue · cold</span>);
+        tags.push(<span key={`cont${i}`} className="tree-cont cold">{tr("▸ continue · cold")}</span>);
       } else if (tip.state === "partial") {
-        tags.push(<span key={`cont${i}`} className="tree-cont expiring">▸ continue · partly cached</span>);
+        tags.push(<span key={`cont${i}`} className="tree-cont expiring">{tr("▸ continue · partly cached")}</span>);
       }
     } else if (tip.file && tip.file !== currentFile) {
       tags.push(<button key={`tip${i}`} className="tree-tip open" onClick={e => { e.stopPropagation(); onOpenTip(tip.file); }}
-        title="open this branch in a new tab">
-        ⎘ open · {tip.title || "branch"}
+        title={tr("open this branch in a new tab")}>
+        {tr("⎘ open · {name}", { name: tip.title || tr("branch") })}
       </button>);
     } else {
-      tags.push(<span key={`tip${i}`} className="tree-tip">branch tip</span>);
+      tags.push(<span key={`tip${i}`} className="tree-tip">{tr("branch tip")}</span>);
     }
   }
   return tags;
@@ -193,9 +194,9 @@ const TreeRow = React.memo(function TreeRow({ row, model, now, since, selected, 
       <TreeGraph graph={row.graph} state={row.state} lanes={model.lanes} height={height} />
       <div className="tree-text">
         <div className="tree-prompt" title={row.text}>
-          <span className="tree-time mono">{TreeFmt.when(row.ts, now)}</span>{row.text || <i>(no text)</i>}
+          <span className="tree-time mono">{TreeFmt.when(row.ts, now)}</span>{row.text || <i>{tr("(no text)")}</i>}
         </div>
-        <div className="tree-reply">{row.reply ? row.reply : <i>no text reply</i>}</div>
+        <div className="tree-reply">{row.reply ? row.reply : <i>{tr("no text reply")}</i>}</div>
         {tags.length > 0 && <div className="tree-tips">{tags}</div>}
       </div>
       <TreeMeter row={row} ttlMs={model.ttlMs} now={now} />
@@ -206,8 +207,8 @@ const TreeRow = React.memo(function TreeRow({ row, model, now, since, selected, 
 const TreeCompaction = React.memo(function TreeCompaction({ row, now }) {
   return (
     <div className="tree-compaction">
-      <span>context compacted · {TreeFmt.when(row.ts, now)}</span>
-      <span>prompts above re-ask the full earlier context</span>
+      <span>{tr("context compacted · {when}", { when: TreeFmt.when(row.ts, now) })}</span>
+      <span>{tr("prompts above re-ask the full earlier context")}</span>
     </div>
   );
 });

@@ -63,18 +63,18 @@ function BrowserPopover({ pick, page, failed, onSave, onCancel }) {
   return (
     <div className="browser-popover" style={style} ref={ref}>
       <div className="browser-popover-what mono">
-        {pick.kind === "area" ? "area" : pick.selector || pick.tag || "element"}
+        {pick.kind === "area" ? tr("area") : pick.selector || pick.tag || tr("element")}
       </div>
       {failed && (
         <div className="browser-popover-note">
-          Screenshot failed — annotation will be sent without image
+          {tr("Screenshot failed — annotation will be sent without image")}
         </div>
       )}
       <textarea
         autoFocus
         rows={3}
         value={text}
-        placeholder="comment — Enter saves, Shift+Enter new line, Esc cancels"
+        placeholder={tr("comment — Enter saves, Shift+Enter new line, Esc cancels")}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={onKeyDown}
       />
@@ -87,17 +87,17 @@ function BrowserPanel({ ui }) {
   // Rust's error text wins whatever the status: a stopped browser says why
   // ("browser connection lost"), a running one reports a failed tab switch
   // or load. While running it is a strip that leaves the page usable.
-  const message = state.error || _BP_STATUS[state.status];
+  const statusText = _BP_STATUS[state.status];
+  const message = state.error || (statusText ? tr(statusText) : null);
   const strip = state.status === "running";
-  const retry = state.status === "stopped" || state.status === "error";
   const marked = page ? chips.filter((c) => c.pick.url === state.url) : [];
   return (
-    <section className="browser-panel" aria-label="browser">
+    <section className="browser-panel" aria-label={tr("browser")}>
       <_BP_Toolbar ui={ui} />
       <div className="browser-body">
         {state.loading && <div className="browser-loading" />}
         <div className={`browser-view${ui.annotate ? " annotating" : ""}`} ref={ui.viewRef}>
-          <textarea className="browser-sink" ref={ui.sinkRef} aria-label="page keyboard input" tabIndex={0}
+          <textarea className="browser-sink" ref={ui.sinkRef} aria-label={tr("page keyboard input")} tabIndex={0}
             autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} />
           <canvas className="browser-canvas" ref={ui.canvasRef} />
           {marked.map((c) => (
@@ -116,7 +116,7 @@ function BrowserPanel({ ui }) {
             <div className={`browser-status ${state.status}${state.error ? " failed" : ""}${strip ? " strip" : ""}`}
               role={state.error ? "alert" : "status"}>
               <span>{message}</span>
-              {retry && <button className="btn" onClick={ui.restart}>reload</button>}
+              {retry && <button className="btn" onClick={ui.restart}>{tr("reload")}</button>}
             </div>
           )}
         </div>

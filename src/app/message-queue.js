@@ -18,6 +18,7 @@
    is prepared first.
    ═════════════════════════════════════════════════════════════════════ */
 (function () {
+  const { tr } = window.OMP_I18N;
   const KINDS = ["steering", "followUp"];
   const IMAGE_CHIP = "[Image]";
   const EMPTY_QUEUE = Object.freeze({ steering: Object.freeze([]), followUp: Object.freeze([]) });
@@ -87,8 +88,8 @@
    *  has a copy button) that its own text cannot close
    *  (app/marked-setup.js `fenceCode`). */
   function failureNote(kind, error, text) {
-    const what = kind === "steering" ? "Steer" : "Follow-up";
-    const head = `**${what} not sent:** ${error}`;
+    const what = kind === "steering" ? tr("Steer") : tr("Follow-up");
+    const head = tr("**{what} not sent:** {error}", { what, error });
     return text ? `${head}\n\n${window.OMP_MARKDOWN.fenceCode(text)}` : head;
   }
 

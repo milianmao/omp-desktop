@@ -14,7 +14,8 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win = {};
 // The schema loads before the modules it reads bounds from: they are read late.
-for (const f of ["constants.js", "settings-schema.js", "accent.js", "chat-collapse.js", "prompt-history.js", "session-ui.js", "keymap.js"]) {
+// i18n.js first: settings-schema destructures OMP_I18N.tr at load.
+for (const f of ["i18n.js", "constants.js", "settings-schema.js", "accent.js", "chat-collapse.js", "prompt-history.js", "session-ui.js", "keymap.js"]) {
   // eslint-disable-next-line no-new-func
   new Function("window", readFileSync(join(root, "src/app", f), "utf8"))(win);
 }
@@ -178,6 +179,28 @@ check("the key bindings row is found by any shortcut action's name or id", () =>
   assert.ok(sidebar);
   for (const q of [sidebar.label, sidebar.id]) {
     assert.ok(S.search(q, vals()).groups.some(g => g.rows.some(r => r.id === "custom:shortcuts")), q);
+  }
+});
+
+check("the language row exists with raw auto/en/zh values and display labels", () => {
+  const appearance = S.SECTIONS.find(s => s.id === "appearance");
+  assert.deepEqual(appearance.groups.map(g => g.name), ["Theme", "Text", "Language"]);
+  const lang = row("lang");
+  assert.equal(lang.type, "seg");
+  assert.deepEqual(lang.options.map(o => o.value), ["auto", "en", "zh"], "raw values, no tr at the schema");
+  assert.deepEqual(lang.options.map(o => o.label), ["Automatic", "English", "中文"]);
+  assert.equal(D.lang, "auto");
+});
+
+check("search finds the language row in either language, under either UI language", () => {
+  assert.ok(S.search("Language", vals()).groups.some(g => g.rows.some(r => r.id === "lang")), "English label, en UI");
+  assert.ok(S.search("语言", vals()).groups.some(g => g.rows.some(r => r.id === "lang")), "Chinese keyword, en UI");
+  win.OMP_I18N.setLang("zh");
+  try {
+    assert.ok(S.search("语言", vals()).groups.some(g => g.rows.some(r => r.id === "lang")), "Chinese label, zh UI");
+    assert.ok(S.search("Language", vals()).groups.some(g => g.rows.some(r => r.id === "lang")), "English original, zh UI");
+  } finally {
+    win.OMP_I18N.setLang("en");
   }
 });
 

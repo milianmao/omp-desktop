@@ -17,6 +17,7 @@
 // (RpcSubagentSnapshot, RpcSubagent*Frame) and packages/wire/src/index.ts
 // (AgentProgress, SubagentLifecyclePayload, SubagentProgressPayload).
 (function () {
+  const { tr } = window.OMP_I18N;
   const STREAM_CAP = 200;
   const TERMINAL = new Set(["completed", "failed", "aborted"]);
   const LIVE = new Set(["pending", "running"]);
@@ -153,7 +154,7 @@
       case "tool_execution_start":
         return { t: now, kind: "tool", tool: ev.toolName ?? "", text: formatArgs(ev.args) };
       case "tool_execution_end":
-        return ev.isError ? { t: now, kind: "error", tool: ev.toolName ?? "", text: "tool failed" } : null;
+        return ev.isError ? { t: now, kind: "error", tool: ev.toolName ?? "", text: tr("tool failed") } : null;
       case "message_end": {
         const m = ev.message;
         // A user message attributed to the user is one a person sent the
@@ -350,8 +351,7 @@
     return usd < 0.1 ? `$${usd.toFixed(3)}` : `$${usd.toFixed(2)}`;
   }
   function fmtAgo(ms) {
-    if (ms < 1500) return "now";
-    // Tier on the rounded value: 59_600ms must not print "60s".
+    if (ms < 1500) return tr("now");
     if (ms < 59_500) return `${Math.round(ms / 1000)}s`;
     return `${Math.round(ms / 60_000)}m`;
   }

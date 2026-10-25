@@ -141,7 +141,7 @@ function MatrixBackdrop() {
 
 function EmptyWorkspace({ notes }) {
   return (
-    <div className="empty-ws" aria-label="no project open">
+    <div className="empty-ws" aria-label={tr("no project open")}>
       <MatrixBackdrop />
       {notes.length > 0 && (
         <div className="empty-ws-notes">

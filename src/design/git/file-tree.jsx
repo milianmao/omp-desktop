@@ -32,30 +32,30 @@ function GitFileTree({
   if (error) empty = error;
   // A failed status replaces the whole browser, so no root and no error
   // means still loading.
-  else if (!root) empty = "loading…";
-  else if (rows.length === 0) empty = filter.trim() ? "no match" : changedOnly && !commit ? "no changes" : "no files";
+  else if (!root) empty = tr("loading…");
+  else if (rows.length === 0) empty = filter.trim() ? tr("no match") : changedOnly && !commit ? tr("no changes") : tr("no files");
 
   return (
     <div className="gitb-pane gitb-files">
       <div className="gitb-pane-head">
-        <span className="gitb-pane-title">files</span>
+        <span className="gitb-pane-title">{tr("files")}</span>
         {commit && (
-          <span className="gitb-pane-sub mono" title={commit.id}>{commit.short} · {commit.files} file{commit.files === 1 ? "" : "s"}</span>
+          <span className="gitb-pane-sub mono" title={commit.id}>{commit.files === 1 ? tr("{short} · 1 file", { short: commit.short }) : tr("{short} · {n} files", { short: commit.short, n: commit.files })}</span>
         )}
         {onChangedOnly && (
           <button type="button" className={`btn ghost gitb-toggle ${changedOnly ? "on" : ""}`}
-            onClick={() => onChangedOnly(!changedOnly)} title={changedOnly ? "show every file" : "show changed files only"}
+            onClick={() => onChangedOnly(!changedOnly)} title={changedOnly ? tr("show every file") : tr("show changed files only")}
             aria-pressed={changedOnly}>
             <_GT_Icon name="diff2" size={11} />
-            <span>{changedCount} changed</span>
+            <span>{tr("{n} changed", { n: changedCount })}</span>
           </button>
         )}
       </div>
       <div className="gitb-filter">
         <_GT_Icon name="search" size={11} color="var(--fg-4)" />
         <input className="gitb-filter-input mono" value={filter} onChange={e => onFilter(e.target.value)}
-          placeholder="filter files" spellCheck={false} />
-        {filter && <button type="button" className="btn ghost icon" onClick={() => onFilter("")} aria-label="clear filter"><_GT_Icon name="close" size={10} /></button>}
+          placeholder={tr("filter files")} spellCheck={false} />
+        {filter && <button type="button" className="btn ghost icon" onClick={() => onFilter("")} aria-label={tr("clear filter")}><_GT_Icon name="close" size={10} /></button>}
       </div>
       <div className="gitb-tree" role="tree">
         {empty && <div className={`gitb-empty ${error ? "gitb-error" : ""}`}>{empty}</div>}
@@ -78,12 +78,12 @@ function GitFileTree({
               <span className="gitb-row-name" style={meta ? { color: meta.color } : undefined}>
                 {flat ? node.path : node.name}
               </span>
-              {node.dir && node.changed > 0 && !changedOnly && <span className="gitb-dot" title={`${node.changed} changed`} />}
-              {meta && <span className="gitb-mark mono" style={{ color: meta.color }} title={meta.title}>{meta.label}</span>}
+              {node.dir && node.changed > 0 && !changedOnly && <span className="gitb-dot" title={tr("{n} changed", { n: node.changed })} />}
+              {meta && <span className="gitb-mark mono" style={{ color: meta.color }} title={tr(meta.title)}>{meta.label}</span>}
             </div>
           );
         })}
-        {!error && root && truncated && <div className="gitb-empty">list truncated — too many files to show them all</div>}
+        {!error && root && truncated && <div className="gitb-empty">{tr("list truncated — too many files to show them all")}</div>}
       </div>
     </div>
   );

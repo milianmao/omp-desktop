@@ -20,8 +20,8 @@ function _SRL_Widths({ row, ctx, query, modified, onReset }) {
   const { SettingsRow: Row, SettingsButton: Button } = window;
   const { t } = ctx;
   return (
-    <Row stack label={row.label} desc={row.desc} query={query} modified={modified} onReset={onReset}
-      aside={<Button onClick={ctx.panes.reset} disabled={!modified}>Reset all widths</Button>}>
+    <Row stack label={tr(row.label)} desc={tr(row.desc)} query={query} modified={modified} onReset={onReset}
+      aside={<Button onClick={ctx.panes.reset} disabled={!modified}>{tr("Reset all widths")}</Button>}>
       <div className="st-widths">
         {row.keys.map(key => {
           const px = t[key] ?? 0;
@@ -29,8 +29,8 @@ function _SRL_Widths({ row, ctx, query, modified, onReset }) {
             <div key={key} className="st-width">
               <small>{key.replace(/Width$/, "")}</small>
               <b>
-                {px > 0 ? <>{Math.round(px)}<i> px</i></> : <span className="st-width-def">{_SRL_WIDTH_DEFAULT[key] ?? "default"}</span>}
-                {px > 0 && <span className="st-moddot" title="Changed from default" />}
+                {px > 0 ? <>{Math.round(px)}<i> px</i></> : <span className="st-width-def">{tr(_SRL_WIDTH_DEFAULT[key] ?? "default")}</span>}
+                {px > 0 && <span className="st-moddot" title={tr("Changed from default")} />}
               </b>
             </div>
           );
@@ -58,21 +58,21 @@ function _SRL_Widgets({ row, ctx, query }) {
     <>
       {widgets.togglePlugins.map(p => (
         <_SRL_Switch key={p.id} tweak={ctx.widgetTweakKey(p.id)} label={p.title} ctx={ctx} query={query}
-          desc={`Plugin \`${(p.command ?? []).join(" ")}\` · ${p.scope === "global" ? "one card for all tabs" : "per tab"}.`} />
+          desc={tr("Plugin `{command}` · {scope}.", { command: (p.command ?? []).join(" "), scope: p.scope === "global" ? tr("one card for all tabs") : tr("per tab") })} />
       ))}
       {ctx.extToggles.map(r => (
         <_SRL_Switch key={r.tweak} tweak={r.tweak} label={r.label} ctx={ctx} query={query}
-          desc="A widget an omp extension shows in this rail." />
+          desc={tr("A widget an omp extension shows in this rail.")} />
       ))}
-      <Row stack label={row.label} desc={row.desc} query={query}
+      <Row stack label={tr(row.label)} desc={tr(row.desc)} query={query}
         aside={(
           <Button onClick={widgets.reload}>
-            <Icon name="refresh" size={11} />Reload widgets
+            <Icon name="refresh" size={11} />{tr("Reload widgets")}
           </Button>
         )}>
         <div className="st-path">
           <Icon name="file" size={11} />
-          <span className="st-path-text">{widgets.configPath ?? "unavailable"}</span>
+          <span className="st-path-text">{widgets.configPath ?? tr("unavailable")}</span>
         </div>
       </Row>
     </>

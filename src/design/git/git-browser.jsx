@@ -54,27 +54,27 @@ const GitBrowser = React.memo(function GitBrowser({ bridge, onClose, initialPath
   // has a name but no commit yet, so it gets both chips.
   let headChip = null;
   if (repo?.branch) headChip = <span className="gitb-ref head"><_GB_Icon name="branch" size={9} />{repo.branch}</span>;
-  else if (repo?.head) headChip = <span className="gitb-ref remote" title="detached HEAD">{repo.head.slice(0, 7)}</span>;
-  const unbornChip = repo && !repo.head ? <span className="gitb-ref none" title="unborn branch">no commits</span> : null;
+  else if (repo?.head) headChip = <span className="gitb-ref remote" title={tr("detached HEAD")}>{repo.head.slice(0, 7)}</span>;
+  const unbornChip = repo && !repo.head ? <span className="gitb-ref none" title={tr("unborn branch")}>{tr("no commits")}</span> : null;
 
   return (
     <div className="gitb-scrim"
       onMouseDown={e => { downOnScrim.current = e.target === e.currentTarget; }}
       onClick={e => { if (downOnScrim.current && e.target === e.currentTarget) onClose(); downOnScrim.current = false; }}>
-      <div className="gitb" ref={rootRef} role="dialog" aria-modal="true" aria-label="git browser" tabIndex={-1}>
+      <div className="gitb" ref={rootRef} role="dialog" aria-modal="true" aria-label={tr("git browser")} tabIndex={-1}>
         <div className="gitb-head">
           <_GB_Icon name="branch" size={13} color="var(--accent)" />
           <span className="gitb-title">git</span>
           {repo && <span className="gitb-project">{repo.name}</span>}
           {headChip}{unbornChip}
           {repo && (repo.ahead || repo.behind) ? (
-            <span className="gitb-chip mono" title="ahead / behind upstream">↑{repo.ahead ?? 0} ↓{repo.behind ?? 0}</span>
+            <span className="gitb-chip mono" title={tr("ahead / behind upstream")}>↑{repo.ahead ?? 0} ↓{repo.behind ?? 0}</span>
           ) : null}
           <span className="gitb-head-stats mono">
-            {g.status && <span>{changed} changed</span>}
+            {g.status && <span>{tr("{n} changed", { n: changed })}</span>}
           </span>
-          <button type="button" className="btn ghost" onClick={g.refresh} title="refresh" aria-label="refresh"><_GB_Icon name="refresh" size={12} /></button>
-          <button type="button" className="btn ghost" onClick={onClose} title="close (Esc)" aria-label="close"><_GB_Icon name="close" size={12} /></button>
+          <button type="button" className="btn ghost" onClick={g.refresh} title={tr("refresh")} aria-label={tr("refresh")}><_GB_Icon name="refresh" size={12} /></button>
+          <button type="button" className="btn ghost" onClick={onClose} title={tr("close (Esc)")} aria-label={tr("close")}><_GB_Icon name="close" size={12} /></button>
         </div>
         {g.error ? (
           <div className="gitb-empty tall gitb-error">{g.error}</div>

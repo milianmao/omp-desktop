@@ -20,12 +20,13 @@ const {
   discardDeletes: _UGB_discardDeletes,
 } = window.OMP_GIT_BROWSER;
 
-const _UGB_NO_PROJECT = "this tab has no project folder";
+// Late-bound per emission (language switches apply to the next emission).
+const _UGB_noProject = () => window.tr("this tab has no project folder");
 
 /** `{ value, error }` of a bridge result (`{ok, value | error}`, or null
  *  for a tab without a project folder). */
 function _ugbResult(res) {
-  if (!res) return { value: null, error: _UGB_NO_PROJECT };
+  if (!res) return { value: null, error: _UGB_noProject() };
   return res.ok ? { value: res.value, error: null } : { value: null, error: res.error };
 }
 
@@ -175,7 +176,7 @@ function useGitBrowser({ bridge, initialPath, branch, edits }) {
   // let the next status pick another file.
   const discard = React.useCallback(async (path, kind) => {
     const deletes = _UGB_discardDeletes(kind);
-    if (deletes && !window.confirm(`Delete ${path}? It has no committed version — this cannot be undone.`)) return;
+    if (deletes && !window.confirm(window.tr("Delete {path}? It has no committed version — this cannot be undone.", { path }))) return;
     await bridge.workspaceReject(path);
     if (deletes) setSelected(null);
     refresh();

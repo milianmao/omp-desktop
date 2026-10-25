@@ -14,7 +14,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win  = {};
 // The real busy predicate, loaded the same way: restartPlan reads it
 // late-bound from window.OMP_TURN_STATUS.
-for (const file of ["src/app/turn-status.js", "src/app/approval-mode.js"]) {
+// i18n.js first: turn-status destructures OMP_I18N.tr at load (the en path
+// is identity).
+for (const file of ["src/app/i18n.js", "src/app/turn-status.js", "src/app/approval-mode.js"]) {
   // eslint-disable-next-line no-new-func
   new Function("window", readFileSync(join(root, file), "utf8"))(win);
 }

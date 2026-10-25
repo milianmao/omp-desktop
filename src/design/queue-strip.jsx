@@ -37,45 +37,45 @@ function QueueStrip({ queue, sending, canSendNow, onSendNow, onRemove, onPromote
     setNotice(null);
     let text = null;
     try {
-      if (!(await action(row))) text = "already delivered";
+      if (!(await action(row))) text = tr("already delivered");
     } catch (e) {
-      text = `failed: ${e?.message ?? e}`;
+      text = tr("failed: {msg}", { msg: e?.message ?? e });
     }
     setBusy(false);
     if (text) setNotice({ key: row.key, text });
   };
 
   return (
-    <div className="queue-strip" role="list" aria-label="queued messages">
+    <div className="queue-strip" role="list" aria-label={tr("queued messages")}>
       {rows.map(r => {
-        const note = r.sending ? "sending…" : notice?.key === r.key ? notice.text : null;
+        const note = r.sending ? tr("sending…") : notice?.key === r.key ? notice.text : null;
         return (
           <div className={`queue-row ${r.kind}${r.sending ? " sending" : ""}`} role="listitem" key={r.key}>
-            <span className="queue-kind">{_QS_KIND_LABEL[r.kind]}</span>
+            <span className="queue-kind">{tr(_QS_KIND_LABEL[r.kind])}</span>
             <span className="queue-text" title={r.text}>{r.text}</span>
             {note && <span className="queue-note">{note}</span>}
             {!r.sending && (<>
               {canSendNow && (
                 <button className={_QS_BTN} disabled={busy} onClick={() => run(r, onSendNow)}
-                  title="send now: stop the agent's current step (as Esc does) and deliver this message at once"
-                  aria-label="send now">
+                  title={tr("send now: stop the agent's current step (as Esc does) and deliver this message at once")}
+                  aria-label={tr("send now")}>
                   <_QS_Icon name="bolt" size={11} />
                 </button>
               )}
               {r.kind === "followUp" && (
                 <button className={_QS_BTN} disabled={busy} onClick={() => run(r, onPromote)}
-                  title="steer now: deliver at the agent's next step" aria-label="steer now">
+                  title={tr("steer now: deliver at the agent's next step")} aria-label={tr("steer now")}>
                   <_QS_Icon name="arrowUp" size={11} />
                 </button>
               )}
               {r.editable && (
                 <button className={_QS_BTN} disabled={busy} onClick={() => run(r, onEdit)}
-                  title="edit: take the text back into the prompt box" aria-label="edit">
+                  title={tr("edit: take the text back into the prompt box")} aria-label={tr("edit")}>
                   <_QS_Icon name="edit" size={11} />
                 </button>
               )}
               <button className={_QS_BTN} disabled={busy} onClick={() => run(r, onRemove)}
-                title="remove from the queue" aria-label="remove">
+                title={tr("remove from the queue")} aria-label={tr("remove")}>
                 <_QS_Icon name="close" size={10} />
               </button>
             </>)}

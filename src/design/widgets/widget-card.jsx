@@ -36,9 +36,9 @@ function WidgetCard({ title, run, onRefresh, onInsert, insertCfg, source, attent
   const widget = run?.widget ?? null;
   const stale = state === "running" && widget != null;
   const toneClass = state === "error" ? "tone-error" : (state === "ok" || stale) && widget ? `tone-${widget.status}` : "tone-neutral";
-  const meta = source ?? (state === "running" ? "running…" : run?.durationMs != null ? `${run.durationMs} ms · ${_wcTime(run.at)}` : "");
+  const meta = source ?? (state === "running" ? tr("running…") : run?.durationMs != null ? tr("{n} ms · {time}", { n: run.durationMs, time: _wcTime(run.at) }) : "");
   return (
-    <div role={attention ? "group" : undefined} aria-label={attention ? `${title}: needs attention` : undefined}
+    <div role={attention ? "group" : undefined} aria-label={attention ? tr("{title}: needs attention", { title }) : undefined}
       className={`rail-card glass wdg-card ${toneClass}${stale ? " wdg-stale" : ""}${source ? " wdg-pushed" : ""}${attention ? " wdg-attn" : ""}`}
       onClick={attention ? onAck : undefined}>
       <div className="rail-card-head">
@@ -46,13 +46,13 @@ function WidgetCard({ title, run, onRefresh, onInsert, insertCfg, source, attent
         <span className="mono wdg-title">{title}</span>
         {meta ? <span className="chip muted mono wdg-meta">{meta}</span> : <span className="wdg-meta" />}
         {attention && (
-          <button className="btn icon ghost wdg-ack" title="Acknowledge" aria-label="Acknowledge"
+          <button className="btn icon ghost wdg-ack" title={tr("Acknowledge")} aria-label={tr("Acknowledge")}
             onClick={(e) => { e.stopPropagation(); onAck?.(); }}>
             <_WC_Icon name="check" size={10} />
           </button>
         )}
         {onRefresh && (
-          <button className="btn icon ghost" title="refresh" aria-label={`refresh ${title}`} disabled={state === "running"} onClick={onRefresh}>
+          <button className="btn icon ghost" title={tr("refresh")} aria-label={tr("refresh {title}", { title })} disabled={state === "running"} onClick={onRefresh}>
             <_WC_Icon name="refresh" size={10} />
           </button>
         )}
@@ -60,16 +60,16 @@ function WidgetCard({ title, run, onRefresh, onInsert, insertCfg, source, attent
       {state === "error" && (
         <>
           <div className="wdg-error selectable">{run.error}</div>
-          {run.lastOkAt != null && <div className="wdg-note mono">last ok {_wcTime(run.lastOkAt)}</div>}
+          {run.lastOkAt != null && <div className="wdg-note mono">{tr("last ok {time}", { time: _wcTime(run.lastOkAt) })}</div>}
         </>
       )}
       {(state === "ok" || stale) && widget && (
         <>
           <_WC_Blocks blocks={widget.blocks} onInsert={onInsert} insertCfg={insertCfg} />
-          {widget.skipped > 0 && <div className="wdg-note mono">{widget.skipped} unsupported block{widget.skipped > 1 ? "s" : ""}</div>}
+          {widget.skipped > 0 && <div className="wdg-note mono">{widget.skipped === 1 ? tr("1 unsupported block") : tr("{n} unsupported blocks", { n: widget.skipped })}</div>}
         </>
       )}
-      {state === "idle" && <div className="wdg-note mono">not run yet</div>}
+      {state === "idle" && <div className="wdg-note mono">{tr("not run yet")}</div>}
     </div>
   );
 }
@@ -96,19 +96,19 @@ function WidgetApprovalCard({ title, command, changed, onApprove }) {
       <div className="rail-card-head">
         <span className="wdg-dot" />
         <span className="mono wdg-title">{title}</span>
-        <span className="chip muted mono wdg-meta">{changed ? "changed" : "needs approval"}</span>
+        <span className="chip muted mono wdg-meta">{changed ? tr("changed") : tr("needs approval")}</span>
       </div>
       <div className="wdg-note">
         {changed
-          ? "This plugin's command or script changed since you approved it. It will not run until you approve it again."
-          : "This plugin runs the command below automatically once approved."}
+          ? tr("This plugin's command or script changed since you approved it. It will not run until you approve it again.")
+          : tr("This plugin runs the command below automatically once approved.")}
       </div>
       <div className="wdg-argv mono selectable">
         {(command ?? []).map((arg, i) => <div key={i} className="wdg-argv-line">{_WC_argvDisplay(arg)}</div>)}
       </div>
       <div className="wdg-approval-actions">
         <button className="btn primary" disabled={busy || !onApprove} onClick={approve}>
-          {changed ? "Approve again" : "Approve"}
+          {changed ? tr("Approve again") : tr("Approve")}
         </button>
       </div>
     </div>
@@ -139,7 +139,7 @@ class WidgetBoundary extends React.Component {
   render() {
     const { error } = this.state;
     if (!error) return this.props.children;
-    return <WidgetErrorCard title={this.props.title} error={`render failed: ${error?.message ?? String(error)}`} />;
+    return <WidgetErrorCard title={this.props.title} error={tr("render failed: {message}", { message: error?.message ?? String(error) })} />;
   }
 }
 

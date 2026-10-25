@@ -23,15 +23,16 @@
 // app/use-terminal.jsx destructures it at top level, so it must load
 // before it.
 (function () {
+  const { tr } = window.OMP_I18N;
   const SKIPPED_LINE = "\r\n\x1b[2m[output skipped]\x1b[0m\r\n";
 
   function exitLine(code) {
     const label = code == null ? "" : ` (code ${code})`;
-    return `\r\n\x1b[2mshell exited${label} \u2014 press Enter to restart\x1b[0m\r\n`;
+    return tr("\r\n\x1b[2mshell exited{code} \u2014 press Enter to restart\x1b[0m\r\n", { code: label });
   }
 
   function failLine(error) {
-    return `\r\n\x1b[31mcould not start the shell: ${error}\x1b[0m \u2014 press Enter to retry\r\n`;
+    return tr("\r\n\x1b[31mcould not start the shell: {error}\x1b[0m \u2014 press Enter to retry\r\n", { error });
   }
 
   /** xterm colours from the active theme's CSS variables. */

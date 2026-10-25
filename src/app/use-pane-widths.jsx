@@ -89,7 +89,9 @@ function usePaneWidths({ tweaks, setTweak, open, reserve, workspaceRef }) {
 
   const handle = (name) => ({
     edge: _PW_UI[name].edge,
-    label: _PW_UI[name].label,
+    // The handle's aria label: translated at emission so a language switch
+    // applies from the next render.
+    label: window.tr(_PW_UI[name].label),
     drag: drags[name],
     value: widths[name],
     min: _PW_PANES[name].min,

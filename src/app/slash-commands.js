@@ -15,6 +15,7 @@
    as omp's editor) — see "Mid-prompt skills" below.
    ═════════════════════════════════════════════════════════════════════ */
 (function () {
+  const { tr } = window.OMP_I18N;
   const DESKTOP = "desktop";
 
   // Only entries app-live.jsx `handleCommand` actually implements, plus
@@ -49,7 +50,7 @@
     { name: "expand-all",   hint: "expand every tool card and thinking block in this tab",   icon: "▾", group: "View" },
     { name: "check-updates", hint: "check for OMP Desktop updates",            icon: "↑", group: "View"    },
     { name: "terminal",  hint: "show or hide this tab's shell panel",          icon: "▸", group: "View"    },
-  ].map((c) => Object.freeze({ ...c, source: DESKTOP, aliases: [] })));
+  ].map((c) => Object.freeze({ ...c, hint: tr(c.hint), group: tr(c.group), source: DESKTOP, aliases: [] })));
 
   const SOURCE_STYLE = {
     builtin: { group: "Commands", icon: "›" },
@@ -104,7 +105,7 @@
         // the description, not the argument syntax folded into `hint`.
         description,
         icon:    style.icon,
-        group:   style.group,
+        group:   tr(style.group),
         source,
         aliases: Array.isArray(c.aliases) ? c.aliases.map(cleanName).filter(Boolean) : [],
       });

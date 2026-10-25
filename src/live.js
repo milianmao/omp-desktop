@@ -24,6 +24,7 @@
   const GOAL = window.OMP_GOAL;
   const EXT = window.OMP_EXT_WIDGETS;
   const { tsOf, mergeTranscript } = window.OMP_TRANSCRIPT;
+  const { tr } = window.OMP_I18N;
 
   // ── Safe defaults so design components never crash on missing fields ──────
   const DEFAULT_DATA = {
@@ -650,22 +651,21 @@
    *  @param {string=} profileId the tab's profile, if any */
   function _exitNote(reason, profileId) {
     if (!/no models available/i.test(reason)) {
-      return `**Agent process exited:** ${reason}`;
+      return tr("**Agent process exited:** {reason}", { reason });
     }
     const flag = profileId && profileId !== DEFAULT_PROFILE_ID ? ` --profile ${profileId}` : "";
     return [
-      "**This profile has no model credentials yet.**",
+      tr("**This profile has no model credentials yet.**"),
       "",
-      "omp's RPC mode refuses to start without a usable model, so this tab has no agent —"
-        + " which is also why `/login` and the provider list do nothing here.",
+      tr("omp's RPC mode refuses to start without a usable model, so this tab has no agent — which is also why `/login` and the provider list do nothing here."),
       "",
-      "Log in once from a terminal, then reopen the tab:",
+      tr("Log in once from a terminal, then reopen the tab:"),
       "",
       "```",
       `omp${flag}`,
       "```",
       "",
-      `omp reported: ${reason}`,
+      tr("omp reported: {reason}", { reason }),
     ].join("\n");
   }
 
@@ -1309,7 +1309,7 @@
     if (!window.__TAURI__) return { ok: false, error: "not connected" };
     const entry = sessionRegistry.get(id);
     if (!entry) return { ok: false, error: "unknown tab" };
-    const what = fresh ? "Profile switch" : "Approval mode change";
+    const what = fresh ? tr("Profile switch") : tr("Approval mode change");
     // Re-entrancy: this call spans two awaits, and a second respawn of the
     // same tab would read `wasActive` as false (call 1 already nulled the
     // active slot), so it would never re-activate or `_initFetch` the
@@ -1448,7 +1448,7 @@
           ? await _invokeSafe("session_status", { sessionId: id }, null)
           : null;
         if (spawnError && activeSessionId === id && !cached) {
-          _pushAssistantNote(`**${what} failed:** ${spawnError}`);
+          _pushAssistantNote(tr("**{what} failed:** {error}", { what, error: spawnError }));
         }
       }
       notify();
@@ -1668,7 +1668,7 @@
    *  already rolled the tab back. The note has no `ts` (omp holds no turn
    *  for it), so the next `get_messages` merge keeps it in place. */
   function _reportOpenFailure(e) {
-    const note = `**Could not open project:** ${String(e?.message ?? e)}`;
+    const note = tr("**Could not open project:** {error}", { error: String(e?.message ?? e) });
     if (activeSessionId) _pushAssistantNote(note);
     else workspaceNotes = [...workspaceNotes, note];
     notify();
@@ -1803,7 +1803,7 @@
       if (!saved) return;
       if (saved.skipped.length > 0) {
         notes.push(
-          "**Could not reopen tabs whose folder no longer exists:**\n\n" +
+          tr("**Could not reopen tabs whose folder no longer exists:**") + "\n\n" +
           saved.skipped.map(p => `- \`${p}\``).join("\n"),
         );
       }
@@ -1814,7 +1814,7 @@
           id = await _startProjectSession(cwd, { ...opts, activate: false, remember: false });
         } catch (e) {
           console.error(`[live] reopening tab '${cwd}' failed:`, e);
-          notes.push(`**Could not reopen ${tab.name || cwd || "a tab"}:** ${String(e?.message ?? e)}`);
+          notes.push(tr("**Could not reopen {name}:** {error}", { name: tab.name || cwd || tr("a tab"), error: String(e?.message ?? e) }));
           continue;
         }
         restored.push(id);
@@ -2239,7 +2239,7 @@
       // {value: <text>} or {cancelled: true}.
       if (ev.method === "input") {
         state.messages = [...state.messages, _askMessage("input", ev, {
-          placeholder: ev.placeholder ?? "Enter value…",
+          placeholder: ev.placeholder ?? tr("Enter value…"),
         })];
         notify();
         return;
@@ -3229,7 +3229,7 @@
    *  transcript is mid-turn); omp's own refusals (`session_busy`) arrive as
    *  the rejection's message. `text` is the branched prompt (empty for a fork). */
   async function _moveToNewFile(send) {
-    if (state.isStreaming) return { ok: false, error: "Wait for the current turn to finish." };
+    if (state.isStreaming) return { ok: false, error: tr("Wait for the current turn to finish.") };
     let data;
     try {
       data = await send();
@@ -3380,10 +3380,10 @@
     async goalStart(objective, tokenBudget, images, prompt) {
       const text = String(objective ?? "").trim();
       const imgs = images ?? [];
-      if (!text) return { ok: false, error: "Describe the goal first." };
+      if (!text) return { ok: false, error: tr("Describe the goal first.") };
       const message = String(prompt ?? "").trim() || text;
       const origin = activeSessionId;
-      if (!origin) return { ok: false, error: "Not connected" };
+      if (!origin) return { ok: false, error: tr("Not connected") };
       const wasStreaming = state.isStreaming;
       try {
         const data = await _sendWithResponse(
@@ -3477,7 +3477,7 @@
         await _sendWithResponse({ type: "prompt", message: rename.command }, QUICK_CMD_TIMEOUT_MS);
       } catch (e) {
         if (activeSessionId === id) {
-          _pushAssistantNote(`Rename failed: ${e?.message ?? e}`);
+          _pushAssistantNote(tr("Rename failed: {error}", { error: e?.message ?? e }));
           notify();
         }
         // Keep the expectation: the user may have switched away right after
@@ -3744,9 +3744,9 @@
       }
       if (!res.ok) {
         _reopenAsk(prompt.id);
-        _pushAssistantNote(`**Approve and remember failed:** ${res.error}. The prompt is open again.`);
+        _pushAssistantNote(tr("**Approve and remember failed:** {error}. The prompt is open again.", { error: res.error }));
       } else {
-        _pushAssistantNote(`**Approved, but the rule was not saved:** ${unsaved}`);
+        _pushAssistantNote(tr("**Approved, but the rule was not saved:** {detail}", { detail: unsaved }));
       }
       notify();
     },

@@ -36,6 +36,9 @@ function node(extra = {}) {
 
 /** The real browser.js and what it calls on `window`, as index.html loads them. */
 function loadHelpers(window) {
+  // i18n.js first: browser.js destructures OMP_I18N.tr at load (the en path
+  // is the identity, so the assertions below are unchanged).
+  runInNewContext(source("src/app/i18n.js"), { window });
   runInNewContext(source("src/app/constants.js"), { window });
   runInNewContext(source("src/app/session-ui.js"), { window });
   runInNewContext(source("src/app/image-attach.js"), { window, atob, Uint8Array });

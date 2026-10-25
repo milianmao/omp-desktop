@@ -13,6 +13,9 @@ import vm from "node:vm";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ctx = vm.createContext({ console });
 ctx.window = ctx;
+// i18n.js first: adapter destructures OMP_I18N.tr at load (the en path is
+// the identity, so the assertions below are unchanged).
+vm.runInContext(readFileSync(join(root, "src", "app", "i18n.js"), "utf8"), ctx, { filename: "i18n.js" });
 vm.runInContext(readFileSync(join(root, "src", "adapter.js"), "utf8"), ctx, { filename: "adapter.js" });
 const { pickRecentModels } = ctx;
 

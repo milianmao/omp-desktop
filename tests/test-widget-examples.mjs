@@ -18,6 +18,10 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win = {};
+// i18n.js first: widgets.js destructures OMP_I18N.tr at load (the en path is
+// identity).
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func
 new Function("window", readFileSync(join(root, "src/app/widgets.js"), "utf8"))(win);
 const { parseOutput } = win.OMP_WIDGETS;

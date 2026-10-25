@@ -35,8 +35,8 @@ function _AD_Text({ text }) {
 
 function AskQuestion({ q, qi, total, entry, onPick, onType, onEnter }) {
   const needsAnswer = total > 1 && _AD.unanswered(q, entry);
-  const placeholder = q.options.length === 0 ? "Type your answer…"
-    : q.multi ? "Add your own…" : "Or type your own answer…";
+  const placeholder = q.options.length === 0 ? tr("Type your answer…")
+    : q.multi ? tr("Add your own…") : tr("Or type your own answer…");
   return (
     <section className="ask-q">
       {(total > 1 || q.header) && (
@@ -44,13 +44,13 @@ function AskQuestion({ q, qi, total, entry, onPick, onType, onEnter }) {
           {total > 1 && <span className="mono">{qi + 1}/{total}</span>}
           {q.header && <span className="chip warn">{q.header}</span>}
           <span className={`ask-q-kind${needsAnswer ? " todo" : ""}`}>
-            {q.multi ? "pick any" : needsAnswer ? "needs an answer" : "pick one"}
+            {q.multi ? tr("pick any") : needsAnswer ? tr("needs an answer") : tr("pick one")}
           </span>
         </div>
       )}
       <div className="ask-question"><_AD_Markdown text={q.question} /></div>
       {q.options.length > 0 && (
-        <div className="ask-rows" role={q.multi ? "group" : "radiogroup"} aria-label={q.header ?? `Question ${qi + 1}`}>
+        <div className="ask-rows" role={q.multi ? "group" : "radiogroup"} aria-label={q.header ?? tr("Question {n}", { n: qi + 1 })}>
           {q.options.map((o, oi) => {
             const on = entry.picks.includes(oi);
             return (
@@ -61,7 +61,7 @@ function AskQuestion({ q, qi, total, entry, onPick, onType, onEnter }) {
                   <span className="ask-row-text">
                     <span className="ask-row-label">
                       <span><_AD_Text text={o.label} /></span>
-                      {q.recommended === oi && <span className="chip warn">recommended</span>}
+                      {q.recommended === oi && <span className="chip warn">{tr("recommended")}</span>}
                     </span>
                     {o.description && <span className="ask-row-desc"><_AD_Text text={o.description} /></span>}
                   </span>
@@ -95,13 +95,13 @@ function AskSummary({ questions, answers }) {
               {q.header && <span className="chip warn">{q.header}</span>}
               <span className="ask-sum-q-text"><_AD_Text text={q.question.replace(/\s+/g, " ").trim()} /></span>
             </div>
-            {!a && <div className="ask-sum-a none">not answered</div>}
-            {a && picked.length === 0 && !a.customInput && <div className="ask-sum-a none">nothing picked</div>}
+            {!a && <div className="ask-sum-a none">{tr("not answered")}</div>}
+            {a && picked.length === 0 && !a.customInput && <div className="ask-sum-a none">{tr("nothing picked")}</div>}
             {picked.map((label, i) => (
               <div key={i} className="ask-sum-a"><_AD_Check /><span><_AD_Text text={label} /></span></div>
             ))}
             {a?.customInput && (
-              <div className="ask-sum-a"><_AD_Check /><span>{a.customInput}</span><span className="typed">typed</span></div>
+              <div className="ask-sum-a"><_AD_Check /><span>{a.customInput}</span><span className="typed">{tr("typed")}</span></div>
             )}
           </div>
         );
@@ -130,10 +130,12 @@ function AskDialog({ msg, onSubmit, onCancel }) {
     if (onClick) send(next); else update(next);
   };
   const progress = onClick
-    ? (canSend ? "Enter sends your answer" : "Click an option to answer")
+    ? (canSend ? tr("Enter sends your answer") : tr("Click an option to answer"))
     : missing > 0
-      ? `${missing} question${missing === 1 ? "" : "s"} still need${missing === 1 ? "s" : ""} an answer`
-      : "Ready to send";
+      ? (missing === 1
+          ? tr("{n} question still needs an answer", { n: missing })
+          : tr("{n} questions still need an answer", { n: missing }))
+      : tr("Ready to send");
 
   // Bare Shift+Tab is a window shortcut (thinking level) even inside text
   // fields; here it has to move focus back through the dialog instead.
@@ -153,10 +155,10 @@ function AskDialog({ msg, onSubmit, onCancel }) {
       <div className="ask-dialog-foot">
         <span className={`ask-progress${!onClick && missing > 0 ? " incomplete" : ""}`}>{progress}</span>
         <span className="ask-foot-spacer" />
-        <button type="button" className="ask-opt" onClick={onCancel}>Cancel</button>
+        <button type="button" className="ask-opt" onClick={onCancel}>{tr("Cancel")}</button>
         {(!onClick || canSend) && (
           <button type="button" className="ask-submit" disabled={!canSend} onClick={() => send(draft)}>
-            {questions.length > 1 ? "Submit answers" : "Submit"}
+            {questions.length > 1 ? tr("Submit answers") : tr("Submit")}
           </button>
         )}
       </div>

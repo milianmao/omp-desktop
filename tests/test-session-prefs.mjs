@@ -12,7 +12,9 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win  = {};
 // busyTabs reads window.OMP_TURN_STATUS.isBusyRunState.
-for (const file of ["src/app/turn-status.js", "src/app/session-prefs.js"]) {
+// i18n.js first: turn-status/session-prefs destructure OMP_I18N.tr at load
+// (the en path is the identity, so the assertions below are unchanged).
+for (const file of ["src/app/i18n.js", "src/app/turn-status.js", "src/app/session-prefs.js"]) {
   // eslint-disable-next-line no-new-func
   new Function("window", readFileSync(join(root, file), "utf8"))(win);
 }

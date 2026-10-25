@@ -10,9 +10,9 @@ function InlinePlan({ plan }) {
       <div className="inline-plan-head">
         <_ChatIcon name="plan" size={12} color="var(--accent)" />
         <span style={{ color: "var(--fg-2)", fontWeight: 600 }}>{plan.title}</span>
-        <span className="chip muted">{plan.phases.reduce((n, p) => n + p.tasks.length, 0)} tasks</span>
+        <span className="chip muted">{tr("{n} tasks", { n: plan.phases.reduce((n, p) => n + p.tasks.length, 0) })}</span>
         <div style={{ flex: 1 }} />
-        <button className="btn ghost" style={{ height: 22 }}>open kanban →</button>
+        <button className="btn ghost" style={{ height: 22 }}>{tr("open kanban →")}</button>
       </div>
       <div className="inline-plan-body">
         {plan.phases.map((ph) => (
@@ -53,17 +53,17 @@ function _AB_Failure({ failure: f }) {
   return (
     <div className="ass-failure">
       <div className="ass-failure-head">
-        <span className="ass-failure-title">request failed</span>
+        <span className="ass-failure-title">{tr("request failed")}</span>
         {f.httpStatus != null && <span className="chip danger mono">HTTP {f.httpStatus}</span>}
         {f.retryable && (
-          <span className="chip warn" title="omp already retried it; sending again later may work">temporary</span>
+          <span className="chip warn" title={tr("omp already retried it; sending again later may work")}>{tr("temporary")}</span>
         )}
         {where && <span className="chip muted mono">{where}</span>}
       </div>
       <div className="ass-failure-msg selectable">{f.headline}</div>
       {f.raw !== f.headline && (
         <details className="ass-failure-raw">
-          <summary>provider response</summary>
+          <summary>{tr("provider response")}</summary>
           <pre className="selectable">{f.raw}</pre>
         </details>
       )}
@@ -74,11 +74,12 @@ function _AB_Failure({ failure: f }) {
 // How omp's automatic retries ended on this reply (app/turn-status.js
 // `retryFinished`); the failed attempts left the conversation.
 function _AB_Retries({ retries: r }) {
-  const n = `${r.failed} failed attempt${r.failed === 1 ? "" : "s"}`;
+  const one = r.failed === 1;
+  const n = one ? tr("{n} failed attempt", { n: r.failed }) : tr("{n} failed attempts", { n: r.failed });
   const [label, title] = r.outcome === "recovered"
-    ? [`after ${n}`, "omp retried the request by itself until it answered"]
-    : r.outcome === "stopped" ? [n, "Retrying was stopped"]
-    : [n, "omp gave up retrying"];
+    ? [one ? tr("after {n} failed attempt", { n: r.failed }) : tr("after {n} failed attempts", { n: r.failed }), tr("omp retried the request by itself until it answered")]
+    : r.outcome === "stopped" ? [n, tr("Retrying was stopped")]
+    : [n, tr("omp gave up retrying")];
   return <span className={`chip mono ${r.outcome === "recovered" ? "warn" : "muted"}`} title={title}>{label}</span>;
 }
 
@@ -102,11 +103,11 @@ function AssistantBubble({ msg, idx, highlighted, annotable, annotations, onAnno
           {msg.lead === "thinking" && (
             <span className="chip" style={{ color: "var(--lilac)", borderColor: "color-mix(in oklab, var(--lilac) 30%, var(--line))" }}>
               <_ChatIcon name="thinking" size={10} />
-              thinking
+              {tr("thinking")}
             </span>
           )}
           {msg.retries && <_AB_Retries retries={msg.retries} />}
-          <_ChatCopy className="ass-copy" label="Copy message" text={copyText} />
+          <_ChatCopy className="ass-copy" label={tr("Copy message")} text={copyText} />
         </div>
         {msg.thought && (
           <div className={`thought selectable${thoughtCollapsed ? " is-collapsed" : ""}`}>

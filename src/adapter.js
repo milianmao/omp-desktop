@@ -6,6 +6,7 @@
 
 (function () {
   "use strict";
+  const { tr } = window.OMP_I18N;
 
   // ── Tool name normalisation ───────────────────────────────────────────────
   // Maps omp tool names → design TOOL_META keys (ui.jsx)
@@ -368,7 +369,7 @@
       extra.evalLanguage = details.language;
     }
     if (card.tool === "read") {
-      extra.summary = details?.lines ? `${details.lines} lines` : card.summary;
+      extra.summary = details?.lines ? tr("{n} lines", { n: details.lines }) : card.summary;
       const images = _resultImages(event.result);
       if (images.length) extra.images = images;
     }

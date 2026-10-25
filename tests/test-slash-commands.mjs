@@ -13,6 +13,10 @@ import { dirname, join } from "node:path";
 const root  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const src   = readFileSync(join(root, "src/app/slash-commands.js"), "utf8");
 const win   = {};
+// i18n.js first: slash-commands destructures OMP_I18N.tr at load (the en
+// path is the identity, so the assertions below are unchanged).
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func
 new Function("window", src)(win);
 const S = win.OMP_SLASH;

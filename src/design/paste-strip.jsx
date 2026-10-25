@@ -23,25 +23,25 @@ function PasteStrip({ pastes, onExpand }) {
             <div className={`paste-chip${isOpen ? " open" : ""}`} key={p.id}>
               <button
                 className="paste-chip-label"
-                title={isOpen ? "hide pasted text" : "show pasted text"}
+                title={isOpen ? tr("hide pasted text") : tr("show pasted text")}
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? "paste-preview" : undefined}
                 onClick={() => setOpenId(isOpen ? null : p.id)}
               >
                 <_PS_Icon name="file" size={11} color="var(--fg-3)" />
-                <span className="mono">paste #{p.id}</span>
-                <span className="paste-chip-meta">{p.lines} line{p.lines === 1 ? "" : "s"}</span>
+                <span className="mono">{tr("paste #{n}", { n: p.id })}</span>
+                <span className="paste-chip-meta">{p.lines === 1 ? tr("1 line") : tr("{n} lines", { n: p.lines })}</span>
                 <_PS_Icon name={isOpen ? "chev" : "chevR"} size={10} color="var(--fg-4)" />
               </button>
-              <button className="paste-chip-expand" title="put the pasted text into the prompt to edit it" onClick={() => onExpand(p.id)}>
-                expand
+              <button className="paste-chip-expand" title={tr("put the pasted text into the prompt to edit it")} onClick={() => onExpand(p.id)}>
+                {tr("expand")}
               </button>
             </div>
           );
         })}
       </div>
       {open && (
-        <pre id="paste-preview" className="paste-preview mono selectable" tabIndex={0} aria-label={`paste #${open.id}`}>
+        <pre id="paste-preview" className="paste-preview mono selectable" tabIndex={0} aria-label={tr("paste #{n}", { n: open.id })}>
           {open.text}
         </pre>
       )}

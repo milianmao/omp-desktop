@@ -80,7 +80,10 @@ const Icon = ({ name, size = 14, color = "currentColor", dotColor = "var(--accen
   );
 };
 
-// Tool name → color + icon
+// Tool name → color + icon. `label` is the card's display tag: the raw
+// English key (i18n-zh-chat.js translates it), so a render site calling
+// tr(label) switches language live. The tool ids/keys stay English — the
+// code matches on those.
 const TOOL_META = {
   read:    { color: "var(--cyan)",    icon: "file",   label: "read" },
   search:  { color: "var(--lilac)",   icon: "search", label: "find" },

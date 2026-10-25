@@ -13,7 +13,9 @@ const root  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win   = {};
 // marked-setup.js provides `OMP_MARKDOWN.fenceCode` (failureNote's fence)
 // without marked/hljs; the rest of it returns early here.
-for (const f of ["src/app/marked-setup.js", "src/app/message-queue.js"]) {
+// i18n.js first: message-queue destructures OMP_I18N.tr at load (the en
+// path is the identity, so the assertions below are unchanged).
+for (const f of ["src/app/i18n.js", "src/app/marked-setup.js", "src/app/message-queue.js"]) {
   // eslint-disable-next-line no-new-func
   new Function("window", readFileSync(join(root, f), "utf8"))(win);
 }

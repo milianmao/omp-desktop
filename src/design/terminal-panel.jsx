@@ -38,11 +38,11 @@ function TerminalPanel({ entry, height, hidden, onHeight, onClose, mountRef, onC
         {cwd && <span className="term-head-cwd" title={cwd}>{cwd}</span>}
         {_TP_isExited(entry) && (
           <span className="term-head-exited" title={entry.error ?? undefined}>
-            {entry.error != null ? "failed to start"
-              : `exited${entry.status.exitCode == null ? "" : ` (${entry.status.exitCode})`}`}
+            {entry.error != null ? tr("failed to start")
+              : entry.status.exitCode == null ? tr("exited") : tr("exited ({code})", { code: entry.status.exitCode })}
           </span>
         )}
-        <button type="button" className="btn icon ghost term-head-close" title="hide terminal" onClick={onClose}>
+        <button type="button" className="btn icon ghost term-head-close" title={tr("hide terminal")} onClick={onClose}>
           <_TP_Icon name="close" size={9} />
         </button>
       </div>

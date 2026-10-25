@@ -17,6 +17,9 @@
   // `browserLocalhostInPanel`: a plain click on a localhost chat link opens
   // the panel instead of the system browser. (The Chromium path is a Rust
   // setting, browser.json — never a tweak.)
+  // `lang`: the interface language ("auto" | "en" | "zh"), the i18n layer's
+  // setting — "auto" follows the system language (app/i18n.js reads and
+  // re-syncs it live; it is inert to everything else).
   // Settings page (#37): `defaultSide` is the side column a new tab starts
   // with; `followOutput` pins the transcript to the newest message;
   // `terminalScrollback` is xterm's scrollback in lines; `submitKey` is
@@ -30,6 +33,7 @@
     "density": "compact",
     "layout": "rail",
     "accent": "#8AF0C8",
+    "lang": "auto",
     "monoChat": false,
     "showContext": true,
     "showRadar": true,

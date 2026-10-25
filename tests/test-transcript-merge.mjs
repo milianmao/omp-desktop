@@ -18,7 +18,9 @@ import vm from "node:vm";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ctx = vm.createContext({ console });
 ctx.window = ctx;
-for (const file of ["app/turn-status.js", "app/transcript-merge.js", "adapter.js"]) {
+// i18n.js first: turn-status destructures OMP_I18N.tr at load (the en path
+// is identity).
+for (const file of ["app/i18n.js", "app/turn-status.js", "app/transcript-merge.js", "adapter.js"]) {
   vm.runInContext(readFileSync(join(root, "src", file), "utf8"), ctx, { filename: file });
 }
 const { mergeTranscript } = ctx.OMP_TRANSCRIPT;

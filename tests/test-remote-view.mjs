@@ -317,6 +317,9 @@ function liveBridge() {
     INTENT_FRAMING: () => "", timeNow: () => "00:00",
   };
   const logs = [], calls = [], listeners = new Map();
+  // i18n.js first: live.js destructures OMP_I18N.tr at load (the en path is
+  // the identity, so the assertions below are unchanged).
+  runInNewContext(source("src/app/i18n.js"), { window, console: { log() {}, error: (...args) => logs.push(args) } });
   runInNewContext(source("src/live.js"), { window, console: { log() {}, error: (...args) => logs.push(args) } });
   let fail = false, stopped = 0;
   window.__TAURI__ = {
@@ -619,7 +622,10 @@ function remoteRows() {
     useCallback: fn => fn,
   };
   const window = { Icon: {} };
-  const scope = { window, React };
+  // The rows translate their labels through the i18n layer (bare `tr` is
+  // window.tr in the browser, src/index.html loads i18n.js before them).
+  runInNewContext(source("src/app/i18n.js"), { window });
+  const scope = { window, React, tr: window.tr };
   for (const file of ["rows-remote-shared.jsx", "rows-remote-server.jsx", "rows-remote-phones.jsx"]) {
     const { code } = Babel.transform(source(`src/design/settings/${file}`), { presets: ["react"] });
     runInNewContext(code, scope);

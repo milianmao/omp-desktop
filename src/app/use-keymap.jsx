@@ -41,7 +41,7 @@ function useKeymap(bridge, profileId) {
       // each time it is shown, so a transient IPC failure must not revert dispatch
       // to registry defaults or blank the footer's omp/overlay path info
       // until the next successful reload.
-      setError("Keybinding configuration could not be loaded.");
+      setError(window.tr("Keybinding configuration could not be loaded."));
       return;
     }
     hasResolvedRef.current = true;

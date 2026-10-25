@@ -163,7 +163,7 @@ function KanbanCard({ task, idx, mode }) {
           borderColor: `color-mix(in oklab, ${tmeta.color} 30%, var(--line))`,
           background:  `color-mix(in oklab, ${tmeta.color} 10%, transparent)`,
         }}>
-          <Icon name={tmeta.icon} size={9} color={tmeta.color} /> {tmeta.label}
+          <Icon name={tmeta.icon} size={9} color={tmeta.color} /> {tr(tmeta.label)}
         </span>
         {task.effort && (
           <span className="chip mono" style={{ color: effortColor, borderColor: `color-mix(in oklab, ${effortColor} 30%, var(--line))` }}>

@@ -17,8 +17,11 @@
 // fold modes come from OMP_COLLAPSE / OMP_PROMPT_HISTORY / OMP_SESSION_UI,
 // read late (getters), as are OMP_ACCENT (accent comparison), OMP_KEYMAP
 // (shortcut keywords) and TWEAK_DEFAULTS, so load order among the plain
-// app/*.js modules does not matter.
+// app/*.js modules does not matter. The one exception is `tr` (bilingual
+// search below): OMP_I18N is destructured at load — i18n.js is loaded
+// before every app/*.js module (src/index.html).
 (function () {
+  const { tr } = window.OMP_I18N;
   const THEMES = Object.freeze([
     { id: "aurora", tone: "dark", accent: "#8AF0C8" },
     { id: "phosphor", tone: "dark", accent: "#C4FF3F" },
@@ -52,6 +55,10 @@
         tweak("fontSize", "slider", "Font size", "Scales all text and icons, the terminal's font included.", "zoom scale text",
           { min: 75, max: 150, step: 5, unit: "%" }),
         tweak("monoChat", "toggle", "Monospace chat", "Show messages in the monospace font instead of the UI font.", "font"),
+      ] },
+      { name: "Language", rows: [
+        tweak("lang", "seg", "Language", "The interface language. `auto` follows your system language.", "language locale english chinese auto 语言 中文 自动",
+          { options: opts(["auto", "en", "zh"], { auto: "Automatic", en: "English", zh: "中文" }) }),
       ] },
     ] },
     { id: "layout", icon: "grid", title: "Layout", blurb: "What sits beside the chat and how wide each column is.", groups: [
@@ -279,8 +286,14 @@
   // `moreKw`: keywords known only at runtime (the shortcut action names).
   // Custom rows show `label` and `desc` too, plus runtime text of their own;
   // `version` shows runtime text as its desc, `shortcuts` only its editor.
-  const searchText = (row) =>
-    `${row.label} ${(row.desc ?? "").replace(/`/g, "")} ${row.kw ?? ""} ${row.moreKw?.() ?? ""}`.toLowerCase();
+  // Bilingual: both the current language's label/desc and the English
+  // originals are indexed, so a query matches in either language; computed
+  // at query time, so it follows a live language switch (CJK passes
+  // through toLowerCase unchanged).
+  const searchText = (row) => {
+    const plain = (s) => (s ?? "").replace(/`/g, "");
+    return `${tr(row.label)} ${row.label} ${plain(tr(row.desc))} ${plain(row.desc)} ${row.kw ?? ""} ${row.moreKw?.() ?? ""}`.toLowerCase();
+  };
 
   /** Visible rows whose label, desc or keywords contain the query,
    *  case-insensitive, grouped by section › group in page order. */

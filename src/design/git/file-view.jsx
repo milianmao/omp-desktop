@@ -42,7 +42,7 @@ function GitFileView({ path, file, error, commit, onStage, onDiscard }) {
   if (!path) {
     return (
       <div className="gitb-pane gitb-view">
-        <div className="gitb-empty tall">select a file</div>
+        <div className="gitb-empty tall">{tr("select a file")}</div>
       </div>
     );
   }
@@ -63,36 +63,36 @@ function GitFileView({ path, file, error, commit, onStage, onDiscard }) {
         <span className="gitb-view-path" title={file?.path ?? path}>
           <span className="gitb-view-dir">{dir}</span><span className="gitb-view-name">{name}</span>
         </span>
-        {meta && <span className="gitb-chip" style={{ color: meta.color, borderColor: `color-mix(in oklab, ${meta.color} 40%, var(--line))` }}>{meta.title}</span>}
+        {meta && <span className="gitb-chip" style={{ color: meta.color, borderColor: `color-mix(in oklab, ${meta.color} 40%, var(--line))` }}>{tr(meta.title)}</span>}
         {lines && (
           <span className="diff-counts">
             <span style={{ color: "var(--diff-add-fg)" }}>+{file.adds}</span>
             <span style={{ color: "var(--diff-rm-fg)" }}>−{file.rems}</span>
           </span>
         )}
-        {file?.truncated && <span className="gitb-chip" title="cut at the view cap: lines past 20 000 or a line's characters past 500">truncated</span>}
+        {file?.truncated && <span className="gitb-chip" title={tr("cut at the view cap: lines past 20 000 or a line's characters past 500")}>{tr("truncated")}</span>}
         {hunks.length > 0 && (
           <span className="gitb-hunks">
-            <button type="button" className="btn ghost icon" onClick={() => jump(shown - 1)} aria-label="previous change"><_GV_Icon name="arrowUp" size={11} /></button>
+            <button type="button" className="btn ghost icon" onClick={() => jump(shown - 1)} aria-label={tr("previous change")}><_GV_Icon name="arrowUp" size={11} /></button>
             <span>{shown + 1}/{hunks.length}</span>
-            <button type="button" className="btn ghost icon" onClick={() => jump(shown + 1)} aria-label="next change"><_GV_Icon name="chev" size={11} /></button>
+            <button type="button" className="btn ghost icon" onClick={() => jump(shown + 1)} aria-label={tr("next change")}><_GV_Icon name="chev" size={11} /></button>
           </span>
         )}
         {actions && <>
-          <button type="button" className="btn ghost gitb-act" onClick={onStage} title="git add"><_GV_Icon name="check" size={11} /> stage</button>
-          <button type="button" className="btn ghost gitb-act danger" onClick={onDiscard} title="restore from HEAD"><_GV_Icon name="trash" size={11} /> discard</button>
+          <button type="button" className="btn ghost gitb-act" onClick={onStage} title="git add"><_GV_Icon name="check" size={11} /> {tr("stage")}</button>
+          <button type="button" className="btn ghost gitb-act danger" onClick={onDiscard} title={tr("restore from HEAD")}><_GV_Icon name="trash" size={11} /> {tr("discard")}</button>
         </>}
-        {copyText && <_GV_Copy className="gitb-copy" label="Copy diff" text={copyText} />}
+        {copyText && <_GV_Copy className="gitb-copy" label={tr("Copy diff")} text={copyText} />}
       </div>
       <div className="gitb-view-body mono selectable" ref={bodyRef}>
         {/* A refetch (refresh, stage, discard) keeps the previous content in
             view; "loading…" only when there is nothing to show yet. */}
-        {!file && !error && <div className="gitb-empty tall">loading…</div>}
+        {!file && !error && <div className="gitb-empty tall">{tr("loading…")}</div>}
         {error && <div className="gitb-empty tall gitb-error">{error}</div>}
-        {file?.kind === "Binary" && <div className="gitb-empty tall">binary file</div>}
-        {file?.kind === "TooLarge" && <div className="gitb-empty tall">file larger than the 2 MiB view cap</div>}
+        {file?.kind === "Binary" && <div className="gitb-empty tall">{tr("binary file")}</div>}
+        {file?.kind === "TooLarge" && <div className="gitb-empty tall">{tr("file larger than the 2 MiB view cap")}</div>}
         {file?.kind === "Missing" && (
-          <div className="gitb-empty tall">{commit ? "not in this commit" : "no such file in the working tree or HEAD"}</div>
+          <div className="gitb-empty tall">{commit ? tr("not in this commit") : tr("no such file in the working tree or HEAD")}</div>
         )}
         {lines && (
           <div className="gitb-lines">
@@ -106,7 +106,7 @@ function GitFileView({ path, file, error, commit, onStage, onDiscard }) {
             ))}
           </div>
         )}
-        {lines && lines.length === 0 && <div className="gitb-empty">empty file</div>}
+        {lines && lines.length === 0 && <div className="gitb-empty">{tr("empty file")}</div>}
       </div>
     </div>
   );

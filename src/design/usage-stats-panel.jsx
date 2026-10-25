@@ -89,7 +89,7 @@ function UsageStatsPanel({ onClose, profileLabel }) {
       setData(res.value);
     } else {
       setData(EMPTY);
-      setError("no usage in the last 24 hours");
+      setError(tr("no usage in the last 24 hours"));
     }
     setLoading(false);
   }, [bridge]);
@@ -103,55 +103,55 @@ function UsageStatsPanel({ onClose, profileLabel }) {
       <div className="stats-panel" onClick={e => e.stopPropagation()}>
         <div className="stats-head">
           <_StatsIcon name="cost" size={13} color="var(--accent)" />
-          <span className="mono" style={{ color: "var(--fg-2)" }}>usage · {profileLabel} · last 24h</span>
-          <button className="btn icon ghost" style={{ marginLeft: "auto" }} onClick={refresh} title="refresh">
+          <span className="mono" style={{ color: "var(--fg-2)" }}>{tr("usage · {profile} · last 24h", { profile: profileLabel })}</span>
+          <button className="btn icon ghost" style={{ marginLeft: "auto" }} onClick={refresh} title={tr("refresh")}>
             <_StatsIcon name="refresh" size={11} />
           </button>
-          <button className="btn icon ghost" onClick={onClose} title="close">
+          <button className="btn icon ghost" onClick={onClose} title={tr("close")}>
             <_StatsIcon name="close" size={11} />
           </button>
         </div>
         <div className="stats-body">
-          {loading && !overall && <div className="panel-empty mono">syncing session logs…</div>}
+          {loading && !overall && <div className="panel-empty mono">{tr("syncing session logs…")}</div>}
           {!loading && error && <div className="panel-empty mono">{error}</div>}
           {overall && (
             <>
               <div className="stats-cards">
                 <div className="stats-card">
-                  <span className="stats-card-label">requests</span>
+                  <span className="stats-card-label">{tr("requests")}</span>
                   <span className="stats-card-value">{overall.totalRequests.toLocaleString()}</span>
-                  <span className="stats-card-sub">{formatPct(overall.errorRate)} error rate</span>
+                  <span className="stats-card-sub">{tr("{pct} error rate", { pct: formatPct(overall.errorRate) })}</span>
                 </div>
                 <div className="stats-card">
-                  <span className="stats-card-label">cost</span>
+                  <span className="stats-card-label">{tr("cost")}</span>
                   <span className="stats-card-value">{formatCost(overall.totalCost)}</span>
-                  <span className="stats-card-sub">{formatCount(overall.totalPremiumRequests)} premium</span>
+                  <span className="stats-card-sub">{tr("{n} premium", { n: formatCount(overall.totalPremiumRequests) })}</span>
                 </div>
                 <div className="stats-card">
-                  <span className="stats-card-label">tokens</span>
+                  <span className="stats-card-label">{tr("tokens")}</span>
                   <span className="stats-card-value">
-                    {window.formatTokens(overall.totalInputTokens)} in / {window.formatTokens(overall.totalOutputTokens)} out
+                    {tr("{in} in / {out} out", { in: window.formatTokens(overall.totalInputTokens), out: window.formatTokens(overall.totalOutputTokens) })}
                   </span>
-                  <span className="stats-card-sub">{formatPct(overall.cacheRate)} cached</span>
+                  <span className="stats-card-sub">{tr("{pct} cached", { pct: formatPct(overall.cacheRate) })}</span>
                 </div>
                 <div className="stats-card">
-                  <span className="stats-card-label">performance</span>
+                  <span className="stats-card-label">{tr("performance")}</span>
                   <span className="stats-card-value">
-                    {overall.avgTokensPerSecond == null ? "—" : `${Math.round(overall.avgTokensPerSecond)} t/s`}
+                    {overall.avgTokensPerSecond == null ? "—" : tr("{n} t/s", { n: Math.round(overall.avgTokensPerSecond) })}
                   </span>
                   <span className="stats-card-sub">
-                    {formatMs(overall.avgTtft)} ttft · {formatMs(overall.avgDuration)} avg
+                    {tr("{ttft} ttft · {avg} avg", { ttft: formatMs(overall.avgTtft), avg: formatMs(overall.avgDuration) })}
                   </span>
                 </div>
               </div>
 
-              <div className="stats-section-label mono">by model</div>
+              <div className="stats-section-label mono">{tr("by model")}</div>
               <div className="stats-table">
-                {data.byModel.length === 0 && <div className="panel-empty mono">no data</div>}
+                {data.byModel.length === 0 && <div className="panel-empty mono">{tr("no data")}</div>}
                 {data.byModel.map(m => (
                   <div key={`${m.provider}-${m.model}`} className="stats-row">
                     <span className="stats-row-name mono" title={`${m.provider}/${m.model}`}>{m.model}</span>
-                    <span className="stats-row-metric mono">{m.totalRequests.toLocaleString()} req</span>
+                    <span className="stats-row-metric mono">{tr("{n} req", { n: m.totalRequests.toLocaleString() })}</span>
                     <span className="stats-row-metric mono">
                       {window.formatTokens(m.totalInputTokens)}/{window.formatTokens(m.totalOutputTokens)}
                     </span>
@@ -160,13 +160,13 @@ function UsageStatsPanel({ onClose, profileLabel }) {
                 ))}
               </div>
 
-              <div className="stats-section-label mono">by folder</div>
+              <div className="stats-section-label mono">{tr("by folder")}</div>
               <div className="stats-table">
-                {data.byFolder.length === 0 && <div className="panel-empty mono">no data</div>}
+                {data.byFolder.length === 0 && <div className="panel-empty mono">{tr("no data")}</div>}
                 {data.byFolder.map(f => (
                   <div key={f.folder} className="stats-row">
                     <span className="stats-row-name mono" title={f.folder}>{displayFolder(f.folder)}</span>
-                    <span className="stats-row-metric mono">{f.totalRequests.toLocaleString()} req</span>
+                    <span className="stats-row-metric mono">{tr("{n} req", { n: f.totalRequests.toLocaleString() })}</span>
                     <span className="stats-row-metric mono">{formatCost(f.totalCost)}</span>
                   </div>
                 ))}
@@ -174,11 +174,11 @@ function UsageStatsPanel({ onClose, profileLabel }) {
 
               {data.byAgentType.length > 0 && (
                 <>
-                  <div className="stats-section-label mono">by agent type</div>
+                  <div className="stats-section-label mono">{tr("by agent type")}</div>
                   <div className="stats-chips">
                     {data.byAgentType.map(a => (
                       <span key={a.agentType} className="chip muted mono">
-                        {a.agentType} · {a.totalRequests.toLocaleString()} req · {formatCost(a.totalCost)}
+                        {a.agentType} · {tr("{n} req", { n: a.totalRequests.toLocaleString() })} · {formatCost(a.totalCost)}
                       </span>
                     ))}
                   </div>

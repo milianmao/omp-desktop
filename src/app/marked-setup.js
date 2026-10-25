@@ -117,10 +117,13 @@
         // CSP forbids inline ones. The markdown container's delegated
         // onClick (copyCodeBlockClick, ui/copy-button.jsx) copies the
         // sibling <code>'s textContent; its icon and label are CSS, so the
-        // button adds no text to a manual selection.
+        // button adds no text to a manual selection. The label is looked
+        // up late-bound: this file also loads standalone (tests and the
+        // remote page) without the i18n engine present.
+        const copyLabel = window.OMP_I18N?.tr("Copy code") ?? "Copy code";
         return '<pre class="code-block copy-host"><code class="hljs' + cls + '">' +
                highlighted + '</code>' +
-               '<button class="copy-btn is-floating" type="button" aria-label="Copy code" title="Copy code"></button>' +
+               '<button class="copy-btn is-floating" type="button" aria-label="' + copyLabel + '" title="' + copyLabel + '"></button>' +
                '</pre>';
       },
       link({ href, title, tokens, text, autolink }) {

@@ -40,7 +40,7 @@ function _UG_useContinuation(bridge, profileId, active) {
       setSt({
         forProfile: profileId,
         value: res?.ok ? res.value === true : null,
-        error: res?.ok ? null : res?.error ?? "could not read omp's setting",
+        error: res?.ok ? null : res?.error ?? window.tr("could not read omp's setting"),
         busy: false,
       });
     });
@@ -54,7 +54,7 @@ function _UG_useContinuation(bridge, profileId, active) {
     if (reqRef.current !== my) return;
     setSt(s => (res?.ok
       ? { ...s, value: res.value === true, busy: false }
-      : { ...s, busy: false, error: res?.error ?? "could not change the setting" }));
+      : { ...s, busy: false, error: res?.error ?? window.tr("could not change the setting") }));
   };
   const mine = st.forProfile === profileId;
   return { value: mine ? st.value : null, busy: mine && st.busy, error: mine ? st.error : null, set };
@@ -104,7 +104,7 @@ function useGoalMode({ bridge, tabId, sessionIds, goal, planMode, profileId, run
       update(id, () => _UG_IDLE);
       return;
     }
-    update(id, d => ({ ...d, mode: true, error: res?.error ?? "Could not start the goal." }));
+    update(id, d => ({ ...d, mode: true, error: res?.error ?? window.tr("Could not start the goal.") }));
     if (idsRef.current?.includes(id)) onRestoreDraft?.(typed, { tabId: id, shown: tabRef.current === id });
   };
 

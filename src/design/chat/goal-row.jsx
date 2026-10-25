@@ -15,7 +15,7 @@ const GoalRow = React.memo(function GoalRow({ msg, idx, highlighted }) {
   if (msg.event === "continue") {
     return (
       <div className={`goal-cont fade-up${highlighted ? " mm-hot" : ""}`} data-msg-idx={idx}>
-        <span className="goal-cont-tag">goal</span>
+        <span className="goal-cont-tag">{tr("goal")}</span>
         {view.title}
       </div>
     );
@@ -34,7 +34,7 @@ const GoalRow = React.memo(function GoalRow({ msg, idx, highlighted }) {
             color,
             background: `color-mix(in oklab, ${color} 14%, transparent)`,
             borderColor: `color-mix(in oklab, ${color} 30%, var(--line))`,
-          }}>{_GR_TOOL_META.goal.label}</span>
+          }}>{tr(_GR_TOOL_META.goal.label)}</span>
           <span className="tool-title goal-row-title" title={view.detail ?? undefined}>
             {view.title}
             {view.detail && <span className="goal-row-detail"> · {view.detail}</span>}

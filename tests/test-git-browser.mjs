@@ -10,10 +10,12 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const src  = readFileSync(join(root, "src/app/git-browser.js"), "utf8");
 const win  = {};
-// eslint-disable-next-line no-new-func
-new Function("window", src)(win);
+// i18n.js first: git-browser destructures OMP_I18N.tr at load (relativeTime).
+for (const f of ["i18n.js", "git-browser.js"]) {
+  // eslint-disable-next-line no-new-func
+  new Function("window", readFileSync(join(root, "src/app", f), "utf8"))(win);
+}
 const G = win.OMP_GIT_BROWSER;
 
 let passed = 0;

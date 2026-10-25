@@ -12,7 +12,7 @@ const {
 
 const TREE_NO_FILE = "No conversation yet. The tree appears once the tab has a session file.";
 
-const treeTtlLabel = ttlMs => (ttlMs == null ? "cache lifetime unknown" : `cache · ${_CT_Fmt.dur(ttlMs)}`);
+const treeTtlLabel = ttlMs => (ttlMs == null ? tr("cache lifetime unknown") : tr("cache · {dur}", { dur: _CT_Fmt.dur(ttlMs) }));
 
 function TreeSummary({ model }) {
   const c = model.counts;
@@ -20,18 +20,22 @@ function TreeSummary({ model }) {
   return (
     <div className="tree-summary">
       {unknown ? (
-        <div>The provider reports no cache lifetime, so cache status and prices are unknown.</div>
+        <div>{tr("The provider reports no cache lifetime, so cache status and prices are unknown.")}</div>
       ) : (<>
         <div>
-          <b className="lime">{c.warm + c.expiring}</b> of {c.total} prompts can be re-asked at cache-read price
-          {c.partial > 0 && <>, <b className="cyan">{c.partial}</b> partly cached</>}.
+          <b className="lime">{c.warm + c.expiring}</b>{" "}
+          {tr("of {total} prompts can be re-asked at cache-read price", { total: c.total })}
+          {c.partial > 0 && (<>
+            {tr(", ")}<b className="cyan">{c.partial}</b>{" "}{tr("partly cached")}
+          </>)}
+          {"."}
         </div>
         <div className="tree-legend mono">
-          <span><i className="lg warm" />cached</span>
-          <span><i className="lg expiring" />&lt; 10 min</span>
-          <span><i className="lg partial" />partly cached</span>
-          <span><i className="lg cold" />cold</span>
-          <span className="muted">price = re-ask now</span>
+          <span><i className="lg warm" />{tr("cached")}</span>
+          <span><i className="lg expiring" />{tr("< 10 min")}</span>
+          <span><i className="lg partial" />{tr("partly cached")}</span>
+          <span><i className="lg cold" />{tr("cold")}</span>
+          <span className="muted">{tr("price = re-ask now")}</span>
         </div>
       </>)}
     </div>
@@ -68,26 +72,26 @@ function ConversationTree({
 
   let empty = null;
   if (error) empty = error;
-  else if (!model) empty = treeKey && loading ? "Loading…" : TREE_NO_FILE;
-  else if (prompts.length === 0) empty = "No prompts in this conversation yet.";
+  else if (!model) empty = treeKey && loading ? tr("Loading…") : tr(TREE_NO_FILE);
+  else if (prompts.length === 0) empty = tr("No prompts in this conversation yet.");
 
   return (
     <aside className="tree-drawer">
       <div className="tree-head">
-        <span className="tree-title">conversation tree</span>
+        <span className="tree-title">{tr("conversation tree")}</span>
         {model && (
           <span className="chip muted mono">
-            {model.counts.total} prompts
-            {branches > 1 ? ` · ${branches} branches` : ""}
-            {compactions > 0 ? ` · ${compactions} compactions` : ""}
+            {tr("{n} prompts", { n: model.counts.total })}
+            {branches > 1 ? tr(" · {n} branches", { n: branches }) : ""}
+            {compactions > 0 ? tr(" · {n} compactions", { n: compactions }) : ""}
           </span>
         )}
         {model && <span className="chip muted mono">{treeTtlLabel(model.ttlMs)}</span>}
         <div style={{ flex: 1 }} />
-        <button className="btn icon ghost" onClick={onRefresh} disabled={loading || !treeKey} title="refresh">
+        <button className="btn icon ghost" onClick={onRefresh} disabled={loading || !treeKey} title={tr("refresh")}>
           <_CT_Icon name="refresh" size={10} />
         </button>
-        <button className="btn icon ghost" onClick={onClose} title="close">
+        <button className="btn icon ghost" onClick={onClose} title={tr("close")}>
           <_CT_Icon name="close" size={10} />
         </button>
       </div>

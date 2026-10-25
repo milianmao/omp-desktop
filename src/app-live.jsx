@@ -44,6 +44,11 @@ const { linkClick: _fpLinkClick } = window.OMP_FILE_PREVIEW;
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  // A language switch re-renders the whole tree so every render-time tr()
+  // picks it up at once. The state value is deliberately unused — bumping
+  // it IS the re-render; subscribe returns the unsubscribe cleanup.
+  const [, bumpLang] = React.useReducer(n => n + 1, 0);
+  React.useEffect(() => window.OMP_I18N.subscribe(bumpLang), []);
   const data          = window.OMP_DATA;
   const bridge        = window.OMP_BRIDGE;
 
@@ -401,7 +406,7 @@ function App() {
             const quoted = raw.split('\n').map(l => `> ${l}`).join('\n');
             return `${quoted}\n→ ${comment.trim()}`;
           }).join('\n\n');
-        const parts = ['Line comments:\n' + lineComments, text.trim()].filter(Boolean);
+        const parts = [window.tr("Line comments:") + '\n' + lineComments, text.trim()].filter(Boolean);
         msg = parts.join('\n\n');
         updatePlan(markPlanSent); // annotations imply plan is already in progress; spends them
       } else if (!plan.started) {
@@ -443,7 +448,7 @@ function App() {
       bridge.addAssistantMessage(`Logged in to **${provider.name}**.`);
     } catch (err) {
       const msg = err?.message ?? String(err);
-      bridge.addAssistantMessage(`**Login failed (${provider.name}):** ${msg}`);
+      bridge.addAssistantMessage(window.tr("**Login failed ({name}):** {error}", { name: provider.name, error: msg }));
     }
   };
   const cycleThinking    = () => bridge?.cycleThinking();

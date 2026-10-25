@@ -43,7 +43,7 @@ function SaToolChip({ tool, running }) {
   return (
     <span className={`sa-tool${running ? " running" : ""}`} style={{ "--sa-tool": meta.color }}>
       <_SA_Icon name={meta.icon} size={9} color={meta.color} dotColor={meta.color} />
-      {tool || meta.label}
+      {tool || tr(meta.label)}
     </span>
   );
 }
@@ -56,10 +56,10 @@ const SA_STATUS_LABEL = { pending: "queued", running: "running", completed: "don
 const SA_STATUS_CHIP  = { running: "accent", failed: "danger", aborted: "warn" };
 
 function SaStatusChip({ agent }) {
-  const label = agent.unknownOutcome ? "ended" : SA_STATUS_LABEL[agent.status] ?? agent.status;
+  const label = agent.unknownOutcome ? tr("ended") : tr(SA_STATUS_LABEL[agent.status] ?? agent.status);
   const tone = agent.unknownOutcome ? "muted" : SA_STATUS_CHIP[agent.status] ?? "muted";
   return (
-    <span className={`chip ${tone}`} title={agent.unknownOutcome ? "finished while this tab was in the background" : undefined}>
+    <span className={`chip ${tone}`} title={agent.unknownOutcome ? tr("finished while this tab was in the background") : undefined}>
       <SaDot status={agent.status} /> {label}
     </span>
   );
@@ -71,7 +71,7 @@ function SaContextTube({ progress }) {
   if (!used || !total) return null;
   const pct = Math.min(100, (used / total) * 100);
   return (
-    <span className="status-bar-tube sa-tube" title={`context ${window.formatTokens(used)} / ${window.formatTokens(total)}`}>
+    <span className="status-bar-tube sa-tube" title={tr("context {used} / {total}", { used: window.formatTokens(used), total: window.formatTokens(total) })}>
       <span className="status-bar-fill" style={{ width: `${pct}%` }} />
     </span>
   );

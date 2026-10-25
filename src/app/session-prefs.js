@@ -8,6 +8,7 @@
 // <script> tags. Reads window.OMP_TURN_STATUS (app/turn-status.js, loaded
 // later) at call time only. Regression: test-session-prefs.mjs.
 (function () {
+  const { tr } = window.OMP_I18N;
   /** The tweak keys live.js acts on (TWEAK_DEFAULTS, app/constants.js). */
   const KEYS = Object.freeze(["restoreTabs", "confirmBusyClose", "autoName", "autoCompaction", "autoRetry"]);
 
@@ -44,7 +45,7 @@
     const { isBusyRunState } = window.OMP_TURN_STATUS;
     return sessions
       .filter(s => s && isBusyRunState(s.runState))
-      .map(s => ({ id: s.id, name: s.name || "untitled tab", state: BUSY_LABELS[s.runState] ?? "working" }));
+      .map(s => ({ id: s.id, name: s.name || tr("untitled tab"), state: tr(BUSY_LABELS[s.runState] ?? "working") }));
   }
 
   /** Whether the Rust close guard should hold the window's close: the
@@ -65,10 +66,10 @@
     return {
       kind: "tab",
       id,
-      title: "Close a busy tab?",
-      body: "This tab's agent is still at work. Closing the tab stops it.",
+      title: tr("Close a busy tab?"),
+      body: tr("This tab's agent is still at work. Closing the tab stops it."),
       tabs: [tab],
-      confirmLabel: "close tab",
+      confirmLabel: tr("close tab"),
     };
   }
 
@@ -80,12 +81,12 @@
     const one = tabs.length === 1;
     return {
       kind: "quit",
-      title: one ? "Quit with a busy tab?" : `Quit with ${tabs.length} busy tabs?`,
+      title: one ? tr("Quit with a busy tab?") : tr("Quit with {n} busy tabs?", { n: tabs.length }),
       body: one
-        ? "A tab's agent is still at work. Quitting stops it."
-        : "These tabs' agents are still at work. Quitting stops them.",
+        ? tr("A tab's agent is still at work. Quitting stops it.")
+        : tr("These tabs' agents are still at work. Quitting stops them."),
       tabs,
-      confirmLabel: "quit",
+      confirmLabel: tr("quit"),
     };
   }
 

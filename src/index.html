@@ -43,11 +43,28 @@
 
   <!-- Markdown + syntax highlighting — must load before design components.
        marked-setup.js wires marked to hljs and escapes raw HTML / unsafe
-       link schemes; it needs both libs defined, so it comes right after.
-       It also defines window.OMP_MARKDOWN (fenceCode), which
+       link schemes; it needs both libs defined, so it comes right after
+       them (only the i18n block above sits in between; it doesn't touch
+       marked). It also defines window.OMP_MARKDOWN (fenceCode), which
        app/message-queue.js calls. -->
   <script src="marked.min.js"></script>
   <script src="highlight.min.js"></script>
+  <!-- i18n — gettext-style translation layer (English string = key):
+       app/i18n.js is the engine (window.OMP_I18N + window.tr); the six
+       files after it register the zh dictionaries via addLang. All seven
+       are dependency-free IIFEs and must load before every consumer — the
+       earliest Babel/design files and the app/*.js modules below destructure
+       or bare-call tr. app/marked-setup.js is loaded standalone by
+       tests/test-markdown.mjs, so it deliberately uses the guarded
+       late-bound form window.OMP_I18N?.tr(…) ?? … and does not depend on
+       this order. -->
+  <script src="app/i18n.js"></script>
+  <script src="app/i18n-zh-settings.js"></script>
+  <script src="app/i18n-zh-chat.js"></script>
+  <script src="app/i18n-zh-composer.js"></script>
+  <script src="app/i18n-zh-shell.js"></script>
+  <script src="app/i18n-zh-panels.js"></script>
+  <script src="app/i18n-zh-logic.js"></script>
   <script src="app/marked-setup.js"></script>
 
   <!-- App constants. Dependency-free IIFE, loaded before the design

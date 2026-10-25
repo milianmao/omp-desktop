@@ -19,6 +19,7 @@
 (function () {
   "use strict";
 
+  const { tr } = window.OMP_I18N;
   const shows = (node, changedOnly) => !changedOnly || (node.dir ? node.changed > 0 : Boolean(node.status));
 
   /** Rows a tree view renders: `[{ node, depth }]` in display order. A
@@ -119,14 +120,14 @@
    *  days) and years (from 365 days), each floored. A future time is "now". */
   function relativeTime(atSecs, nowSecs) {
     const d = Math.max(0, nowSecs - atSecs);
-    if (d < MINUTE) return "now";
-    if (d < HOUR) return `${Math.floor(d / MINUTE)}m`;
-    if (d < DAY) return `${Math.floor(d / HOUR)}h`;
+    if (d < MINUTE) return tr("now");
+    if (d < HOUR) return tr("{n}m", { n: Math.floor(d / MINUTE) });
+    if (d < DAY) return tr("{n}h", { n: Math.floor(d / HOUR) });
     const days = Math.floor(d / DAY);
-    if (days < 7) return `${days}d`;
-    if (days < 30) return `${Math.floor(days / 7)}w`;
-    if (days < 365) return `${Math.floor(days / 30)}mo`;
-    return `${Math.floor(days / 365)}y`;
+    if (days < 7) return tr("{n}d", { n: days });
+    if (days < 30) return tr("{n}w", { n: Math.floor(days / 7) });
+    if (days < 365) return tr("{n}mo", { n: Math.floor(days / 30) });
+    return tr("{n}y", { n: Math.floor(days / 365) });
   }
 
   /** The changed lines of a `FileView`, one per line prefixed `+`/`-`, for

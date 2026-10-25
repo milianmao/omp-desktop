@@ -53,7 +53,7 @@ function WidgetItem({ item, now, onInsert, insertCfg }) {
         <span className="wdg-item-actions">
           {insert && <WidgetInsertButton text={insert} onInsert={onInsert} insertCfg={insertCfg} />}
           {url && (
-            <button className="btn icon ghost" title={url} aria-label={`open ${url}`} onClick={() => _wbOpen(url)}>
+            <button className="btn icon ghost" title={url} aria-label={tr("open {url}", { url })} onClick={() => _wbOpen(url)}>
               <_WB_Icon name="external" size={9} />
             </button>
           )}
@@ -75,7 +75,7 @@ function WidgetList({ block, onInsert, insertCfg }) {
       <div className="wdg-list">
         {shown.map((it, i) => <WidgetItem key={i} item={it} now={now} onInsert={onInsert} insertCfg={insertCfg} />)}
         {shown.length < items.length && (
-          <button className="btn ghost wdg-more" onClick={() => setExpanded(true)}>+{items.length - shown.length} more</button>
+          <button className="btn ghost wdg-more" onClick={() => setExpanded(true)}>{tr("+{n} more", { n: items.length - shown.length })}</button>
         )}
       </div>
     </>

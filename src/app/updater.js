@@ -18,6 +18,7 @@
    ═════════════════════════════════════════════════════════════════════ */
 (function () {
   "use strict";
+  const { tr } = window.OMP_I18N;
 
   // First background check waits for startup to settle (sessions spawning,
   // profile list, external opens) instead of competing with it.
@@ -73,7 +74,7 @@
         return {
           ...state,
           phase: state.update ? "available" : "error",
-          error: String(action.error ?? "update check failed"),
+          error: String(action.error ?? tr("update check failed")),
         };
 
       case "install-start":
@@ -94,7 +95,7 @@
 
       case "install-failed":
         if (state.phase !== "downloading") return state;
-        return { ...state, phase: "available", progress: null, error: String(action.error ?? "update failed") };
+        return { ...state, phase: "available", progress: null, error: String(action.error ?? tr("update failed")) };
 
       default:
         return state;

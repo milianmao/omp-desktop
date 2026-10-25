@@ -336,6 +336,8 @@
 .copy-btn.is-copied::after { content: "copied"; }
 .copy-btn.is-failed { color: var(--rose); }
 .copy-btn.is-failed::after { content: "copy failed"; }
+html[lang="zh"] .copy-btn.is-copied::after { content: "已复制"; }
+html[lang^="zh"] .copy-btn.is-failed::after { content: "复制失败"; }
 
 /* Floating: top-right of its block. In-flow ones sit in a header row.
    Every copy button shows while its block is hovered (or it has focus,

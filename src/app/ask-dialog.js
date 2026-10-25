@@ -19,6 +19,7 @@
    so the dialog never sends one.
    ═════════════════════════════════════════════════════════════════════ */
 (function () {
+  const { tr } = window.OMP_I18N;
   function nonBlank(value) {
     return typeof value === "string" && value.trim() ? value : null;
   }
@@ -123,8 +124,10 @@
   function timeoutNote(questions, ms) {
     const after = timeoutLabel(ms);
     if (!after) return null;
-    if (!questions.every(q => q.recommended !== null)) return `omp answers for you after ${after}`;
-    return `omp picks the recommended option${questions.length > 1 ? "s" : ""} after ${after}`;
+    if (!questions.every(q => q.recommended !== null)) return tr("omp answers for you after {t}", { t: after });
+    return questions.length > 1
+      ? tr("omp picks the recommended options after {t}", { t: after })
+      : tr("omp picks the recommended option after {t}", { t: after });
   }
 
   /** `text` split into plain runs and `code` runs (a backtick pair). Option

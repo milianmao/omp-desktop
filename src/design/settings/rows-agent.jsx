@@ -21,7 +21,7 @@ function _SRA_StartupProfile({ row, ctx, query }) {
   const current = ctx.startupProfileId;
   const rows = ctx.profiles.map(p => ({
     name: p.name,
-    hint: p.id === DEFAULT_PROFILE_ID ? "built-in" : "",
+    hint: p.id === DEFAULT_PROFILE_ID ? tr("built-in") : "",
     path: "",
     value: p.id,
     checked: p.id === current,
@@ -29,10 +29,10 @@ function _SRA_StartupProfile({ row, ctx, query }) {
   const save = async (id) => {
     setError(null);
     const res = await ctx.onSetStartupProfile(id);
-    if (!res?.ok) setError(res?.error ?? "the profile could not be saved");
+    if (!res?.ok) setError(res?.error ?? tr("the profile could not be saved"));
   };
   return (
-    <Row label={row.label} desc={row.desc} query={query}
+    <Row label={tr(row.label)} desc={tr(row.desc)} query={query}
       resettable={current !== DEFAULT_PROFILE_ID} onReset={() => save(DEFAULT_PROFILE_ID)}>
       <PathPicker name="startup profile" label={_SRA_profileName(ctx, current)} title={current}
         rows={rows} disabled={rows.length === 0} error={error} save={save} />
@@ -45,16 +45,16 @@ function _SRA_GoalContinue({ row, ctx, query }) {
   const profileId = ctx.goal?.profileId ?? null;
   const cont = window.useGoalContinuation(ctx.bridge, profileId, true);
   const name = profileId ? _SRA_profileName(ctx, profileId) : null;
-  const scope = name ? ` Applies to profile “${name}” (omp's config); its running tabs pick it up without a restart.` : "";
+  const scope = name ? " " + tr("Applies to profile “{name}” (omp's config); its running tabs pick it up without a restart.", { name }) : "";
   let control;
   if (cont.value !== null) {
-    control = <Toggle value={cont.value} label={row.label} onChange={v => { if (!cont.busy) cont.set(v); }} />;
+    control = <Toggle value={cont.value} label={tr(row.label)} onChange={v => { if (!cont.busy) cont.set(v); }} />;
   } else {
-    control = <span className="st-ro">{cont.error ? "unavailable" : "reading…"}</span>;
+    control = <span className="st-ro">{cont.error ? tr("unavailable") : tr("reading…")}</span>;
   }
   return (
     <>
-      <Row label={row.label} query={query} desc={`${row.desc}${scope}`}>
+      <Row label={tr(row.label)} query={query} desc={`${tr(row.desc)}${scope}`}>
         {control}
       </Row>
       {cont.error && <div className="st-row-error">{cont.error}</div>}

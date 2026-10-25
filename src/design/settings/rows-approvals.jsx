@@ -17,7 +17,7 @@ function _SRAp_project(ctx) {
 function _SRAp_Mode({ row, ctx, query }) {
   const { SettingsRow: Row, ApprovalModeSection } = window;
   return (
-    <Row stack label={row.label} desc={row.desc} query={query}>
+    <Row stack label={tr(row.label)} desc={tr(row.desc)} query={query}>
       <ApprovalModeSection view={ctx.approvalModes} activeProject={_SRAp_project(ctx)}
         sessions={ctx.sessions} query={query} />
     </Row>
@@ -34,14 +34,18 @@ function _SRAp_Rules({ row, ctx, query }) {
     ctx.bridge.listApprovalRules().then(rules => { if (live) setCount(Array.isArray(rules) ? rules.length : null); });
     return () => { live = false; };
   }, [ctx.bridge, project?.id]);
-  let lead = "Open a tab to see its session and project rules.";
+  let lead = tr("Open a tab to see its session and project rules.");
   if (project && count !== null) {
-    lead = `${count === 0 ? "No" : count} standing rule${count === 1 ? "" : "s"} for this tab's session and project.`;
+    lead = count === 0
+      ? tr("No standing rules for this tab's session and project.")
+      : count === 1
+        ? tr("1 standing rule for this tab's session and project.")
+        : tr("{n} standing rules for this tab's session and project.", { n: count });
   }
   return (
-    <Row label={row.label} query={query} className="st-linkrow" desc={`${lead} ${row.desc}`}>
+    <Row label={tr(row.label)} query={query} className="st-linkrow" desc={`${lead} ${tr(row.desc)}`}>
       <Button accent onClick={ctx.openApprovals}>
-        Manage rules <Icon name="external" size={11} />
+        {tr("Manage rules")} <Icon name="external" size={11} />
       </Button>
     </Row>
   );

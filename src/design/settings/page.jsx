@@ -28,7 +28,7 @@ function _SP_TweakRow({ row, ctx, query }) {
   const { t, setTweak } = ctx;
   const set = v => setTweak(row.key, S.clamp(row, v));
   const frame = {
-    label: row.label, desc: row.desc, query,
+    label: tr(row.label), desc: tr(row.desc), query,
     modified: S.isModified(row, t), onReset: () => setTweak(S.resetRow(row, t)),
   };
   const v = S.value(row, t);
@@ -36,11 +36,11 @@ function _SP_TweakRow({ row, ctx, query }) {
     case "toggle":
       return <_SP_Row {...frame}><_SP_Toggle value={v} onChange={set} label={row.label} /></_SP_Row>;
     case "seg":
-      return <_SP_Row {...frame}><_SP_Seg value={v} options={row.options} onChange={set} label={row.label} /></_SP_Row>;
+      return <_SP_Row {...frame}><_SP_Seg value={v} options={row.options.map(o => ({ ...o, label: tr(o.label) }))} onChange={set} label={row.label} /></_SP_Row>;
     case "slider":
       return (
         <_SP_Row {...frame}>
-          <_SP_Slider value={v} min={row.min} max={row.max} step={row.step} unit={row.unit} onChange={set} label={row.label} />
+          <_SP_Slider value={v} min={row.min} max={row.max} step={row.step} unit={tr(row.unit)} onChange={set} label={row.label} />
         </_SP_Row>
       );
     case "themes":
@@ -69,7 +69,7 @@ function _SP_AnyRow({ row, ctx, query }) {
   const onReset = () => ctx.setTweak(S.resetRow(row, ctx.t, ctx.keyOpts));
   const Comp = window.OMP_SETTINGS_ROWS?.[row.type];
   // A renderer missing (script not loaded) still shows what the row is.
-  if (!Comp) return <_SP_Row label={row.label} desc={row.desc} query={query} />;
+  if (!Comp) return <_SP_Row label={tr(row.label)} desc={tr(row.desc)} query={query} />;
   return <Comp row={row} ctx={ctx} query={query} modified={modified} onReset={onReset} />;
 }
 
@@ -77,8 +77,8 @@ function _SP_Group({ name, src, rows, ctx, query }) {
   return (
     <>
       <div className="st-grp-name">
-        {name}
-        {src && <span className="st-src" title="Saved by the app in this file, not in the window's local storage">{src}</span>}
+        {tr(name)}
+        {src && <span className="st-src" title={tr("Saved by the app in this file, not in the window's local storage")}>{src}</span>}
       </div>
       <div className="st-grp">
         {rows.map(r => <_SP_AnyRow key={r.id} row={r} ctx={ctx} query={query} />)}
@@ -99,6 +99,10 @@ function SettingsPage({ ctx }) {
   const searchRef = React.useRef(null);
 
   const sections = S.SECTIONS;
+  // The strip (controls.jsx) renders section.title directly; translate at
+  // the callsite. Recomputed every render — SECTIONS is stable, so a memo
+  // here would go stale across a live language switch.
+  const stripSections = sections.map(s => ({ ...s, title: tr(s.title) }));
   const idx = Math.max(0, sections.findIndex(s => s.id === ctx.section));
   const section = sections[idx];
   const q = query.trim();
@@ -168,12 +172,12 @@ function SettingsPage({ ctx }) {
     body = (
       <>
         <div className="st-head">
-          <div className="st-kicker">search · {hits.total} setting{hits.total === 1 ? "" : "s"}</div>
+          <div className="st-kicker">{hits.total === 1 ? tr("search · {n} setting", { n: hits.total }) : tr("search · {n} settings", { n: hits.total })}</div>
           <div className="st-h1">“{q}”</div>
         </div>
-        {hits.groups.length === 0 && <div className="st-empty">No setting matches “{q}”.</div>}
+        {hits.groups.length === 0 && <div className="st-empty">{tr("No setting matches “{q}”.", { q })}</div>}
         {hits.groups.map(g => (
-          <_SP_Group key={`${g.sectionId}/${g.groupName}`} name={`${g.sectionTitle} › ${g.groupName}`}
+          <_SP_Group key={`${g.sectionId}/${g.groupName}`} name={`${tr(g.sectionTitle)} › ${tr(g.groupName)}`}
             src={g.src} rows={g.rows} ctx={ctx} query={q} />
         ))}
       </>
@@ -182,9 +186,9 @@ function SettingsPage({ ctx }) {
     body = (
       <>
         <div className="st-head">
-          <div className="st-kicker">{String(idx + 1).padStart(2, "0")} · {section.title}</div>
-          <div className="st-h1">{section.title}</div>
-          <p className="st-blurb">{section.blurb}</p>
+          <div className="st-kicker">{String(idx + 1).padStart(2, "0")} · {tr(section.title)}</div>
+          <div className="st-h1">{tr(section.title)}</div>
+          <p className="st-blurb">{tr(section.blurb)}</p>
         </div>
         {section.groups.map(g => {
           const rows = g.rows.filter(r => S.visible(r, t));
@@ -195,16 +199,16 @@ function SettingsPage({ ctx }) {
   }
 
   return (
-    <div className="settings" role="region" aria-label="Settings" ref={rootRef}>
+    <div className="settings" role="region" aria-label={tr("Settings")} ref={rootRef}>
       <div className="st-top">
         <div className="st-inner">
           <label className="st-search">
             <_SP_Icon name="search" size={14} />
-            <input ref={searchRef} type="text" placeholder="Search settings" value={query} autoComplete="off"
-              spellCheck={false} aria-label="Search settings" onChange={e => setQuery(e.target.value)} />
+            <input ref={searchRef} type="text" placeholder={tr("Search settings")} value={query} autoComplete="off"
+              spellCheck={false} aria-label={tr("Search settings")} onChange={e => setQuery(e.target.value)} />
             <span className="st-kbd">{_SP_IS_MAC ? "⌘F" : "Ctrl+F"}</span>
           </label>
-          <_SP_Strip sections={sections} active={section.id} counts={counts} searching={!!q} onSelect={select} />
+          <_SP_Strip sections={stripSections} active={section.id} counts={counts} searching={!!q} onSelect={select} />
         </div>
       </div>
       <div className="st-body" ref={bodyRef}>
@@ -212,13 +216,13 @@ function SettingsPage({ ctx }) {
       </div>
       <div className="st-foot">
         <div className="st-inner">
-          <span>changes apply at once</span>
+          <span>{tr("changes apply at once")}</span>
           <span className="st-sp" />
           <button type="button" disabled={!canReset} onClick={() => ctx.setTweak(resetEdits)}>
-            reset {q ? "matches" : section.title.toLowerCase()} to defaults
+            {tr("reset {what} to defaults", { what: q ? tr("matches") : tr(section.title).toLowerCase() })}
           </button>
-          <span><span className="st-kbd">←</span> <span className="st-kbd">→</span> sections</span>
-          {closeHint && <span><span className="st-kbd">{closeHint}</span> close tab</span>}
+          <span><span className="st-kbd">←</span> <span className="st-kbd">→</span> {tr("sections")}</span>
+          {closeHint && <span><span className="st-kbd">{closeHint}</span> {tr("close tab")}</span>}
         </div>
       </div>
     </div>

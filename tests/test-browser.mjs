@@ -17,6 +17,10 @@ const load = (path) => new Function("window", readFileSync(join(root, path), "ut
 // constants.js: truncateText; session-ui.js: the per-tab chip map;
 // project-nav.js + path-setting.js: pathMenu's names and rows;
 // layout-widths.js: the chat minimum clampWidth keeps.
+// i18n.js first: session-ui is untouched, but slash-commands and browser.js
+// destructure OMP_I18N.tr at load (the en path is the identity, so the
+// assertions below are unchanged).
+load("src/app/i18n.js");
 load("src/app/constants.js");
 load("src/app/session-ui.js");
 load("src/app/project-nav.js");

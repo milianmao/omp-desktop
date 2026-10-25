@@ -7,6 +7,7 @@
 // Exposes `window.OMP_TURN_STATUS`; IIFE per the project rule for plain
 // <script> tags. Regression: test-turn-status.mjs.
 (function () {
+  const { tr } = window.OMP_I18N;
   /** A tab's run state, the strongest condition first:
    *  - `failed`: the omp process exited with a reason; outranks a stale ask
    *    left open by a process that died mid-turn.
@@ -96,7 +97,7 @@
     if (!message || message.role !== "assistant" || message.stopReason !== "error") return null;
     const raw = typeof message.errorMessage === "string" && message.errorMessage.trim()
       ? stripDiagnostics(message.errorMessage).trim()
-      : UNKNOWN_FAILURE;
+      : tr(UNKNOWN_FAILURE);
     return _failure({
       raw,
       httpStatus: Number.isInteger(message.errorStatus) ? message.errorStatus : null,
@@ -142,7 +143,7 @@
    *  verdict on whether the failure is transient. */
   function withPromptError(failure, error) {
     if (!error || typeof error !== "object") return failure;
-    const raw = _text(error.message) ?? failure?.raw ?? UNKNOWN_FAILURE;
+    const raw = _text(error.message) ?? failure?.raw ?? tr(UNKNOWN_FAILURE);
     return _failure({
       raw,
       httpStatus: Number.isInteger(error.httpStatus) ? error.httpStatus : failure?.httpStatus ?? null,

@@ -11,6 +11,9 @@ import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win  = {};
+// ask-dialog.js destructures OMP_I18N at load (translation layer first).
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func
 new Function("window", readFileSync(join(root, "src/app/ask-dialog.js"), "utf8"))(win);
 const A = win.OMP_ASK_DIALOG;

@@ -73,7 +73,7 @@ function _SRR_useRemote(bridge) {
   React.useEffect(() => _SRR_retain(bridge, setStatus), [bridge]);
   const runNow = React.useCallback(async (call, updateSettings = false) => {
     const result = await call();
-    if (result?.ok === false) { setError(result.error ?? "failed"); return false; }
+    if (result?.ok === false) { setError(result.error ?? tr("failed")); return false; }
     setError(null);
     if (result?.value) _SRR_publish(result.value, updateSettings);
     return true;

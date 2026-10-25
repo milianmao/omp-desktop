@@ -80,7 +80,7 @@ function ProfileMenu({
   const commit = async () => {
     if (busy.current) return;
     const name = draft.trim();
-    if (!name) { setError("name required"); return; }
+    if (!name) { setError(tr("name required")); return; }
     const gen = openGen.current;
     busy.current = true;
     // Held across every await below, including the create path's second
@@ -99,7 +99,7 @@ function ProfileMenu({
         res = { ok: false, error: e?.message ?? String(e) };
       }
       if (gen !== openGen.current) return;   // dismissed mid-round-trip
-      if (!res?.ok) { setError(res?.error ?? "could not save"); return; }
+      if (!res?.ok) { setError(res?.error ?? tr("could not save")); return; }
       // A freshly created profile is what the user wants this tab to use —
       // selecting it here is the whole point of adding it. Awaited, so a
       // refused pick reports instead of closing on a half-done action.
@@ -118,7 +118,7 @@ function ProfileMenu({
           sel = { ok: false, error: e?.message ?? String(e) };
         }
         if (gen !== openGen.current) return;
-        if (sel && !sel.ok) { setError(sel.error ?? "could not switch profile"); return; }
+        if (sel && !sel.ok) { setError(sel.error ?? tr("could not switch profile")); return; }
       }
       close();
     } finally {
@@ -147,7 +147,7 @@ function ProfileMenu({
       busy.current = false;
     }
     if (gen !== openGen.current) return;
-    if (res && !res.ok) { setError(res.error ?? "could not switch profile"); return; }
+    if (res && !res.ok) { setError(res.error ?? tr("could not switch profile")); return; }
     close();
   };
 
@@ -171,7 +171,7 @@ function ProfileMenu({
       busy.current = false;
     }
     if (gen !== openGen.current) return;   // dismissed mid-round-trip
-    setError(res?.ok ? null : res?.error ?? "could not delete");
+    setError(res?.ok ? null : res?.error ?? tr("could not delete"));
   };
 
   const setStartup = async id => {
@@ -191,7 +191,7 @@ function ProfileMenu({
       busy.current = false;
     }
     if (gen !== openGen.current) return;   // dismissed mid-round-trip
-    if (res && !res.ok) setError(res.error ?? "could not set default");
+    if (res && !res.ok) setError(res.error ?? tr("could not set default"));
   };
 
   return (
@@ -199,7 +199,7 @@ function ProfileMenu({
       <button
         ref={triggerRef}
         className="btn ghost outlined profile-trigger"
-        title="omp profile for this tab (auth, sessions, settings)"
+        title={tr("omp profile for this tab (auth, sessions, settings)")}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => (open ? close() : setOpen(true))}>
@@ -210,7 +210,7 @@ function ProfileMenu({
 
       {open && (
         <div className="profile-pop" role="menu">
-          <div className="profile-pop-head mono" role="none">profile · this tab</div>
+          <div className="profile-pop-head mono" role="none">{tr("profile · this tab")}</div>
 
           {/* role="none" on every non-menuitem container: a generic element
               between role="menu" and its items breaks the owned-elements
@@ -247,8 +247,8 @@ function ProfileMenu({
                 <button
                   className={`btn icon ghost profile-star ${isStartup ? "on" : ""}`}
                   title={isStartup
-                    ? `“${p.name}” is the default for new tabs`
-                    : `make “${p.name}” the default for new tabs`}
+                    ? tr("“{name}” is the default for new tabs", { name: p.name })
+                    : tr("make “{name}” the default for new tabs", { name: p.name })}
                   role="menuitemradio"
                   aria-checked={isStartup}
                   onClick={() => setStartup(p.id)}>
@@ -279,11 +279,11 @@ function ProfileMenu({
                     role="menuitem"
                     className={`btn icon ghost profile-del ${armed ? "armed" : ""}`}
                     title={armed
-                      ? "click again to remove from the list (keeps files on disk)"
-                      : `delete profile “${p.name}”`}
+                      ? tr("click again to remove from the list (keeps files on disk)")
+                      : tr("delete profile “{name}”", { name: p.name })}
                     onClick={() => remove(p.id)}>
                     {armed
-                      ? <span className="profile-del-label mono">delete?</span>
+                      ? <span className="profile-del-label mono">{tr("delete?")}</span>
                       : <Icon name="trash" size={10} />}
                   </button>
                 ) : (
@@ -303,7 +303,7 @@ function ProfileMenu({
                 className="profile-input"
                 value={draft}
                 maxLength={48}
-                placeholder={mode === "create" ? "work, home, client…" : "new name"}
+                placeholder={mode === "create" ? tr("work, home, client…") : tr("new name")}
                 onChange={e => { setDraft(e.target.value); setError(null); }}
                 onKeyDown={e => {
                   // Raw `key === "Enter"` would also fire on the Enter that
@@ -312,10 +312,10 @@ function ProfileMenu({
                   if (isSubmitEnter(e)) { e.preventDefault(); commit(); }
                   if (e.key === "Escape") { e.stopPropagation(); cancelEdit(); }
                 }} />
-              <button className="btn icon ghost" title="save" onClick={commit}>
+              <button className="btn icon ghost" title={tr("save")} onClick={commit}>
                 <Icon name="check" size={10} />
               </button>
-              <button className="btn icon ghost" title="cancel" onClick={cancelEdit}>
+              <button className="btn icon ghost" title={tr("cancel")} onClick={cancelEdit}>
                 <Icon name="close" size={9} />
               </button>
             </div>
@@ -323,11 +323,11 @@ function ProfileMenu({
             <React.Fragment>
               <button role="menuitem" className="profile-item" onClick={() => startEdit("create")}>
                 <Icon name="plus" size={10} />
-                <span className="profile-item-name">new profile…</span>
+                <span className="profile-item-name">{tr("new profile…")}</span>
               </button>
               <button role="menuitem" className="profile-item" onClick={() => startEdit("rename")}>
                 <Icon name="edit" size={10} />
-                <span className="profile-item-name">rename “{active.name}”</span>
+                <span className="profile-item-name">{tr("rename “{name}”", { name: active.name })}</span>
               </button>
             </React.Fragment>
           )}
@@ -335,8 +335,8 @@ function ProfileMenu({
           {error && <div className="profile-hint err" role="none">{error}</div>}
           <div className="profile-hint" role="none">
             {armedDelete
-              ? "delete only unlists it — files under ~/.omp/profiles stay on disk"
-              : "tick = default for new tabs · switching restarts this tab’s agent"}
+              ? tr("delete only unlists it — files under ~/.omp/profiles stay on disk")
+              : tr("tick = default for new tabs · switching restarts this tab’s agent")}
           </div>
         </div>
       )}

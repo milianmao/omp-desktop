@@ -18,6 +18,7 @@
 // decided in Rust (the view holds the user's tab choice for 5 s), so there is
 // no frontend helper for it.
 (function () {
+  const { tr } = window.OMP_I18N;
   const MAX_IMAGES = window.OMP_IMAGES.MAX_ATTACHMENTS;
   const HTML_MAX = 1500;
   const MIN_WIDTH = 360;
@@ -61,10 +62,10 @@
     const raw = typeof args === "string" ? args.trim() : "";
     if (!raw) return { open: true };
     if (OMP_MODE_ARGS.test(raw)) {
-      return { note: `**/browser:** the panel shows this tab's page itself, so there is no \`${raw}\` mode to switch. \`/browser <url>\` loads a page.` };
+      return { note: tr("**/browser:** the panel shows this tab's page itself, so there is no `{mode}` mode to switch. `/browser <url>` loads a page.", { mode: raw }) };
     }
     const url = normalizeUrl(raw);
-    return url ? { url } : { note: `**/browser:** \`${raw.replace(/`/g, "'")}\` is not a web address.` };
+    return url ? { url } : { note: tr("**/browser:** `{input}` is not a web address.", { input: raw.replace(/`/g, "'") }) };
   }
 
   // A chat link that points at the developer's own machine: an explicit

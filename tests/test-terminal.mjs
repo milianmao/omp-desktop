@@ -17,6 +17,10 @@ const win = {};
 // keymap.js must load first — terminal.js reads window.OMP_KEYMAP (chords,
 // platform detection) — and project-nav.js + path-setting.js give
 // shellLabel / shellMenu their names and rows.
+// i18n.js before that: keymap and terminal destructure OMP_I18N.tr at load
+// (the en path is identity).
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func
 new Function("window", readFileSync(join(root, "src/app/keymap.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func

@@ -44,7 +44,7 @@ function _GH_Graph({ rows, w }) {
 function _GH_Ref({ r }) {
   const icon = r.kind === "tag" ? "tag" : r.kind === "remote" ? "web" : "branch";
   return (
-    <span className={`gitb-ref ${r.kind}`} title={r.kind === "head" ? `${r.name} (HEAD)` : r.name}>
+    <span className={`gitb-ref ${r.kind}`} title={r.kind === "head" ? tr("{name} (HEAD)", { name: r.name }) : r.name}>
       <_GH_Icon name={icon} size={9} />{r.name}
     </span>
   );
@@ -57,20 +57,20 @@ function GitHistory({ log, changedCount, selected, onSelect }) {
   const commits = rows.length - (rows[0]?.id === _GH_WORKTREE ? 1 : 0);
   const now = Date.now() / 1000;
   const worktreeLabel = changedCount
-    ? `${changedCount} uncommitted change${changedCount === 1 ? "" : "s"}`
-    : "working tree clean";
+    ? (changedCount === 1 ? tr("1 uncommitted change") : tr("{n} uncommitted changes", { n: changedCount }))
+    : tr("working tree clean");
 
   return (
     <div className="gitb-pane gitb-history">
       <div className="gitb-pane-head">
-        <span className="gitb-pane-title">history</span>
-        {log && <span className="gitb-pane-sub" title={log.truncated ? "only the newest commits are listed" : undefined}>
-          all branches · {commits}{log.truncated ? "+" : ""}
+        <span className="gitb-pane-title">{tr("history")}</span>
+        {log && <span className="gitb-pane-sub" title={log.truncated ? tr("only the newest commits are listed") : undefined}>
+          {tr("all branches · {n}", { n: `${commits}${log.truncated ? "+" : ""}` })}
         </span>}
       </div>
       <div className="gitb-log">
-        {!log && <div className="gitb-empty">loading…</div>}
-        {log && rows.length === 0 && <div className="gitb-empty">no commits yet</div>}
+        {!log && <div className="gitb-empty">{tr("loading…")}</div>}
+        {log && rows.length === 0 && <div className="gitb-empty">{tr("no commits yet")}</div>}
         <div className="gitb-log-inner" style={{ height: rows.length * _GH_ROW }}>
           {rows.length > 0 && <_GH_Graph rows={rows} w={graphW} />}
           {rows.map((c, i) => {

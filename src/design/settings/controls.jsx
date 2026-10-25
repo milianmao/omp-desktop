@@ -43,9 +43,9 @@ function SettingsRow({ label, desc, modified, resettable, onReset, stack, aside,
     <div className="st-rt">
       <div className="st-rl">
         {typeof label === "string" ? <SettingsMark text={label} query={query} /> : label}
-        {modified && <span className="st-moddot" title="Changed from default" />}
+        {modified && <span className="st-moddot" title={tr("Changed from default")} />}
         {(modified || resettable) && onReset && (
-          <button type="button" className="st-reset" onClick={reset} title="Reset to default">↺ reset</button>
+          <button type="button" className="st-reset" onClick={reset} title={tr("Reset to default")}>↺ {tr("reset")}</button>
         )}
       </div>
       {desc != null && desc !== "" && (
@@ -118,7 +118,7 @@ function SettingsButton({ children, onClick, accent, disabled, title }) {
  *  tokens (styles.css) to the card, so it previews itself. */
 function ThemeCards({ value, themes, onChange }) {
   return (
-    <div className="st-themes" role="radiogroup" aria-label="Theme">
+    <div className="st-themes" role="radiogroup" aria-label={tr("Theme")}>
       {themes.map(th => (
         <button type="button" key={th.id} className={`st-th theme-${th.id}`} role="radio"
           aria-checked={value === th.id} onClick={() => onChange(th.id)}>
@@ -126,7 +126,7 @@ function ThemeCards({ value, themes, onChange }) {
             <div className="st-pv-s"><i className="a" /><i /><i /><i /></div>
             <div className="st-pv-c"><i className="me" /><i style={{ width: "80%" }} /><i className="cd" /><i style={{ width: "60%" }} /></div>
           </div>
-          <div className="st-nm"><span className="st-radio" />{th.id}<small>{th.tone}</small></div>
+          <div className="st-nm"><span className="st-radio" />{tr(th.id)}<small>{tr(th.tone)}</small></div>
         </button>
       ))}
     </div>
@@ -138,9 +138,9 @@ function AccentSwatches({ value, themeAccent, colors, onChange }) {
   const { sameColor } = window.OMP_ACCENT;
   const own = sameColor(value, themeAccent);
   return (
-    <div className="st-sw" role="radiogroup" aria-label="Accent">
+    <div className="st-sw" role="radiogroup" aria-label={tr("Accent")}>
       <button type="button" className="st-sw-theme" role="radio" aria-checked={own}
-        onClick={() => onChange(themeAccent)}>theme</button>
+        onClick={() => onChange(themeAccent)}>{tr("theme")}</button>
       {colors.map(c => (
         <button type="button" key={c} role="radio" aria-checked={!own && sameColor(value, c)}
           aria-label={c} title={c} style={{ background: c }} onClick={() => onChange(c)} />
@@ -153,7 +153,7 @@ function AccentSwatches({ value, themeAccent, colors, onChange }) {
  *  `searching` (sections without a match dim). */
 function SettingsStrip({ sections, active, counts, searching, onSelect }) {
   return (
-    <div className="st-tabs" role="tablist" aria-label="Settings sections">
+    <div className="st-tabs" role="tablist" aria-label={tr("Settings sections")}>
       {sections.map(s => {
         const n = counts[s.id] ?? 0;
         const selected = !searching && active === s.id;
@@ -166,7 +166,7 @@ function SettingsStrip({ sections, active, counts, searching, onSelect }) {
               <span className="st-tab-lbl">{s.title}</span>
               {n > 0 && (
                 <span className={`st-badge${searching ? "" : " mod"}`}
-                  title={searching ? `${n} matching` : `${n} changed from default`}>{n}</span>
+                  title={searching ? tr("{n} matching", { n }) : tr("{n} changed from default", { n })}>{n}</span>
               )}
             </button>
           </React.Fragment>

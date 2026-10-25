@@ -18,6 +18,11 @@ import { runInNewContext } from "node:vm";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const win = {};
+// i18n.js first: goal.js (and session-ui.js further down) load into win,
+// and the use-goal-mode.jsx sandbox below spreads it — the en path is the
+// identity, so the assertions below are unchanged.
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func
 new Function("window", readFileSync(join(root, "src/app/goal.js"), "utf8"))(win);
 const G = win.OMP_GOAL;

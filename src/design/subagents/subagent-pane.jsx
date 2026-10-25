@@ -54,7 +54,7 @@ function SaSwimlanes({ agents, now, onSelect }) {
         );
       })}
       <div className="sa-lane-axis">
-        <span>-{Math.round(span / 1000)}s</span><span>-{Math.round(span / 2000)}s</span><span>now</span>
+        <span>-{Math.round(span / 1000)}s</span><span>-{Math.round(span / 2000)}s</span><span>{tr("now")}</span>
       </div>
     </div>
   );
@@ -62,7 +62,7 @@ function SaSwimlanes({ agents, now, onSelect }) {
 
 function saFailureLine(a) {
   const err = [...a.stream].reverse().find(l => l.kind === "error");
-  if (err) return `${err.tool} failed`;
+  if (err) return tr("{tool} failed", { tool: err.tool });
   return a.progress?.recentOutput?.[0] ?? ""; // omp sends recentOutput newest-first
 }
 
@@ -91,7 +91,7 @@ function SaAgentRow({ agent: a, depth, now, onSelect }) {
       )}
       {failure && <div className="sa-row-err" title={failure}>{failure}</div>}
       <div className="sa-row-foot">
-        <span>{p?.toolCount ?? 0} tools</span>
+        <span>{tr("{n} tools", { n: p?.toolCount ?? 0 })}</span>
         <span>{window.formatTokens(p?.tokens ?? 0)} tok</span>
         <span>{_SAP.fmtCost(p?.cost ?? 0)}</span>
         <_SAP_Tube progress={p} />
@@ -117,11 +117,11 @@ function SubagentPane({
     <aside className="split sa-pane">
       <div className="split-head">
         <_SAP_Icon name="agent" size={12} color="var(--cyan)" />
-        <span className="mono" style={{ color: "var(--cyan)" }}>subagents</span>
-        <span className="mono" style={{ color: "var(--fg-4)", whiteSpace: "nowrap" }}>· {t.live}/{t.total} live</span>
+        <span className="mono" style={{ color: "var(--cyan)" }}>{tr("subagents")}</span>
+        <span className="mono" style={{ color: "var(--fg-4)", whiteSpace: "nowrap" }}>{tr("· {live}/{total} live", { live: t.live, total: t.total })}</span>
         <div style={{ flex: 1 }} />
-        <span className={`chip muted mono sa-level ${level}`} title="RPC subagent subscription level">{level}</span>
-        <button className="btn icon ghost" onClick={onClose} title="close manager"><_SAP_Icon name="close" size={10} /></button>
+        <span className={`chip muted mono sa-level ${level}`} title={tr("RPC subagent subscription level")}>{level}</span>
+        <button className="btn icon ghost" onClick={onClose} title={tr("close manager")}><_SAP_Icon name="close" size={10} /></button>
       </div>
 
       {selected ? (
@@ -133,34 +133,34 @@ function SubagentPane({
         <div className="sa-pane-body">
           {t.total === 0 ? (
             <div className="sa-empty" style={{ padding: "24px 8px", textAlign: "center" }}>
-              No subagents in this session yet.<br />They appear here the moment a <span className="mono">task</span> call spawns them.
+              {tr("No subagents in this session yet.")}<br />{tr("They appear here the moment a")} <span className="mono">task</span> {tr("call spawns them.")}
             </div>
           ) : (
             <>
               <div className="sa-stats">
-                <div className="sa-stat"><span className="sa-stat-k">tokens</span><span className="sa-stat-v">{window.formatTokens(t.tokens)}</span></div>
-                <div className="sa-stat"><span className="sa-stat-k">cost</span><span className="sa-stat-v">{_SAP.fmtCost(t.cost)}</span></div>
-                <div className="sa-stat"><span className="sa-stat-k">tools</span><span className="sa-stat-v">{t.tools}</span></div>
-                <div className="sa-stat"><span className="sa-stat-k">requests</span><span className="sa-stat-v">{t.requests}</span></div>
+                <div className="sa-stat"><span className="sa-stat-k">{tr("tokens")}</span><span className="sa-stat-v">{window.formatTokens(t.tokens)}</span></div>
+                <div className="sa-stat"><span className="sa-stat-k">{tr("cost")}</span><span className="sa-stat-v">{_SAP.fmtCost(t.cost)}</span></div>
+                <div className="sa-stat"><span className="sa-stat-k">{tr("tools")}</span><span className="sa-stat-v">{t.tools}</span></div>
+                <div className="sa-stat"><span className="sa-stat-k">{tr("requests")}</span><span className="sa-stat-v">{t.requests}</span></div>
               </div>
               <SaSwimlanes agents={all} now={now} onSelect={onSelect} />
               <div className="sa-filters">
                 {SA_FILTERS.map(([key, label]) => (
                   <button key={key} type="button" aria-pressed={filter === key}
                     className={`chip mono sa-filter ${filter === key ? "on" : "muted"}`} onClick={() => onFilter(key)}>
-                    {label} {counts[key]}
+                    {tr(label)} {counts[key]}
                   </button>
                 ))}
               </div>
-              {groups.length === 0 && <div className="sa-empty">Nothing matches this filter.</div>}
+              {groups.length === 0 && <div className="sa-empty">{tr("Nothing matches this filter.")}</div>}
               {groups.map(g => (
                 <section key={g.callId ?? "none"} className="sa-group">
                   <button className="sa-group-head" onClick={() => g.callId && onJumpToCall(g.callId)} disabled={!g.callId}>
                     <_SAP_Icon name="agent" size={10} color="var(--fg-4)" />
                     <span className="mono">task</span>
-                    <span className="mono sa-muted">{g.callId ? g.callId.slice(-6) : "detached"}</span>
-                    <span>· {g.rows.length} agent{g.rows.length === 1 ? "" : "s"}</span>
-                    {g.callId && <span className="sa-jump mono">jump to call ↗</span>}
+                    <span className="mono sa-muted">{g.callId ? g.callId.slice(-6) : tr("detached")}</span>
+                    <span>{tr(g.rows.length === 1 ? "· {n} agent" : "· {n} agents", { n: g.rows.length })}</span>
+                    {g.callId && <span className="sa-jump mono">{tr("jump to call ↗")}</span>}
                   </button>
                   {g.rows.map(r => <SaAgentRow key={r.agent.id} agent={r.agent} depth={r.depth} now={now} onSelect={onSelect} />)}
                 </section>

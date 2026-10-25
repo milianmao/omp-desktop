@@ -39,10 +39,10 @@ function _FP_lines(path, body) {
 // The non-content kinds of Rust's `FilePreview` (TooLarge's text names the
 // size, below).
 const _FP_STATES = {
-  Binary:   { title: "Binary file", sub: "There is no text preview for this file." },
-  TooLarge: { title: "Too large to preview" },
-  Missing:  { title: "File no longer exists", sub: "It was deleted or moved after the agent touched it." },
-  Outside:  { title: "Outside the project", sub: "The preview reads only files inside this tab's project folder." },
+  Binary:   { title: tr("Binary file"), sub: tr("There is no text preview for this file.") },
+  TooLarge: { title: tr("Too large to preview") },
+  Missing:  { title: tr("File no longer exists"), sub: tr("It was deleted or moved after the agent touched it.") },
+  Outside:  { title: tr("Outside the project"), sub: tr("The preview reads only files inside this tab's project folder.") },
 };
 
 // Memoised: a re-render of the head (a copy click) must not rebuild every row.
@@ -95,7 +95,7 @@ function FilePreview({ target, onClose, onOpenGit }) {
     setRes(null);
     // `{ok, value | error}`, never a rejection (live.js `_invokeResult`).
     window.OMP_BRIDGE.readProjectFile(target.path)
-      .then((r) => { if (live) setRes(r ?? { ok: false, error: "No tab is open." }); });
+      .then((r) => { if (live) setRes(r ?? { ok: false, error: tr("No tab is open.") }); });
     return () => { live = false; };
   }, [target.path]);
 
@@ -128,10 +128,10 @@ function FilePreview({ target, onClose, onOpenGit }) {
   const range = target.range;
 
   let body;
-  if (!res) body = <div className="fp-state"><span className="shimmer-text">Loading…</span></div>;
-  else if (!res.ok) body = <_FP_State title="Can't preview this file" sub={res.error} />;
+  if (!res) body = <div className="fp-state"><span className="shimmer-text">{tr("Loading…")}</span></div>;
+  else if (!res.ok) body = <_FP_State title={tr("Can't preview this file")} sub={res.error} />;
   else if (state) {
-    const sub = state.sub ?? `${_FP_size(value.size)} is over the preview limit.`;
+    const sub = state.sub ?? tr("{size} is over the preview limit.", { size: _FP_size(value.size) });
     body = <_FP_State title={state.title} sub={sub} />;
   } else if (imgSrc) {
     body = (
@@ -147,7 +147,7 @@ function FilePreview({ target, onClose, onOpenGit }) {
       className="fp-scrim"
       role="dialog"
       aria-modal="true"
-      aria-label={`Preview of ${shownPath}`}
+      aria-label={tr("Preview of {path}", { path: shownPath })}
       tabIndex={-1}
       onMouseDown={(e) => { downOnScrim.current = e.target === e.currentTarget; }}
       onClick={(e) => {
@@ -161,24 +161,24 @@ function FilePreview({ target, onClose, onOpenGit }) {
           <span className="fp-crumb mono" title={shownPath}>
             {shownPath.slice(0, slash)}<b>{shownPath.slice(slash)}</b>
           </span>
-          {clip && <span className="chip muted mono">{clip.total} lines</span>}
+          {clip && <span className="chip muted mono">{tr("{n} lines", { n: clip.total })}</span>}
           {clip?.truncated && (
-            <span className="chip warn mono" title={`Shown: the first ${_FP_MAX_LINES} lines, each cut at ${_FP_MAX_LINE_CHARS} characters`}>truncated</span>
+            <span className="chip warn mono" title={tr("Shown: the first {lines} lines, each cut at {chars} characters", { lines: _FP_MAX_LINES, chars: _FP_MAX_LINE_CHARS })}>{tr("truncated")}</span>
           )}
           {value && value.kind !== "Missing" && value.kind !== "Outside" && <span className="chip muted mono">{_FP_size(value.size)}</span>}
           {value?.kind === "Text" && range && (
             <span className="chip accent mono">
-              {range.to === range.from ? `line ${range.from}` : `read ${range.from}–${range.to}`}
+              {range.to === range.from ? tr("line {n}", { n: range.from }) : tr("read {from}–{to}", { from: range.from, to: range.to })}
             </span>
           )}
           <div className="fp-spacer" />
-          <_FP_Copy className="fp-copy" label="Copy the project-relative path" text={shownPath} />
+          <_FP_Copy className="fp-copy" label={tr("Copy the project-relative path")} text={shownPath} />
           {openable && (
-            <button type="button" className="btn outlined" onClick={() => onOpenGit(shownPath)} title="Open in the git browser">
-              <_FP_Icon name="branch" size={12} /> Open in git browser
+            <button type="button" className="btn outlined" onClick={() => onOpenGit(shownPath)} title={tr("Open in the git browser")}>
+              <_FP_Icon name="branch" size={12} /> {tr("Open in git browser")}
             </button>
           )}
-          <button type="button" className="btn ghost icon" onClick={onClose} title="Close (Esc)" aria-label="Close">
+          <button type="button" className="btn ghost icon" onClick={onClose} title={tr("Close (Esc)")} aria-label={tr("Close")}>
             <_FP_Icon name="close" size={12} />
           </button>
         </div>

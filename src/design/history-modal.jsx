@@ -12,10 +12,10 @@ function formatRelativeTime(ts) {
   if (isNaN(date.getTime())) return ts;
   const now = new Date();
   const diffSec = Math.floor((now - date) / 1000);
-  if (diffSec < 60) return "just now";
-  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
-  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
-  if (diffSec < 604800) return `${Math.floor(diffSec / 86400)}d ago`;
+  if (diffSec < 60) return tr("just now");
+  if (diffSec < 3600) return tr("{n}m ago", { n: Math.floor(diffSec / 60) });
+  if (diffSec < 86400) return tr("{n}h ago", { n: Math.floor(diffSec / 3600) });
+  if (diffSec < 604800) return tr("{n}d ago", { n: Math.floor(diffSec / 86400) });
   return date.toLocaleDateString();
 }
 
@@ -120,16 +120,16 @@ function HistoryModal({ open, onClose, onResume, activeCwd }) {
           <input
             ref={inputRef}
             className="bridge-input mono"
-            placeholder="Search saved conversations by title, query, project…"
+            placeholder={tr("Search saved conversations by title, query, project…")}
             value={query}
             onChange={e => { setQuery(e.target.value); setActiveIdx(0); }}
           />
           {query && (
-            <button className="btn icon ghost" title="Clear search" onClick={() => setQuery("")}>
+            <button className="btn icon ghost" title={tr("Clear search")} onClick={() => setQuery("")}>
               <Icon name="close" size={10} color="var(--fg-4)" />
             </button>
           )}
-          <button className="btn icon ghost" title="Refresh from disk" onClick={fetchSessions}>
+          <button className="btn icon ghost" title={tr("Refresh from disk")} onClick={fetchSessions}>
             <Icon name="refresh" size={11} color={loading ? "var(--accent)" : "var(--fg-3)"} />
           </button>
           <span className="kbd">esc</span>
@@ -143,10 +143,10 @@ function HistoryModal({ open, onClose, onResume, activeCwd }) {
           background: "var(--bg-surface)",
           fontSize: "var(--d-text-xs)",
         }}>
-          <span className="mono" style={{ color: "var(--fg-4)", marginRight: 4, lineHeight: "22px" }}>filter:</span>
+          <span className="mono" style={{ color: "var(--fg-4)", marginRight: 4, lineHeight: "22px" }}>{tr("filter:")}</span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, flex: 1, minWidth: 0, maxHeight: 74, overflowY: "auto" }}>
             {/* key null = "all"; "*" cannot be the normPath of a cwd */}
-            {[{ key: null, path: "", name: "All Projects", parent: "", sessions }, ...projects].map(p => (
+            {[{ key: null, path: "", name: tr("All Projects"), parent: "", sessions }, ...projects].map(p => (
               <button
                 key={p.key ?? "*"}
                 className={`btn ${activeKey === p.key ? "accent outlined" : "ghost"}`}
@@ -158,21 +158,21 @@ function HistoryModal({ open, onClose, onResume, activeCwd }) {
             ))}
           </div>
           <span className="mono" style={{ color: "var(--fg-4)", lineHeight: "22px", flexShrink: 0 }}>
-            {filtered.length} {filtered.length === 1 ? "session" : "sessions"}
+            {tr(filtered.length === 1 ? "{n} session" : "{n} sessions", { n: filtered.length })}
           </span>
         </div>
 
         {/* List Body */}
         <div ref={listRef} className="bridge-body" style={{ maxHeight: "56vh", padding: "6px 8px" }}>
           {loading && sessions.length === 0 && (
-            <div className="bridge-empty">Scanning disk for saved sessions…</div>
+            <div className="bridge-empty">{tr("Scanning disk for saved sessions…")}</div>
           )}
 
           {!loading && filtered.length === 0 && (
             <div className="bridge-empty">
               {query
-                ? `No sessions found matching "${query}"`
-                : "No saved sessions found on disk"}
+                ? tr('No sessions found matching "{q}"', { q: query })
+                : tr("No saved sessions found on disk")}
             </div>
           )}
 
@@ -228,7 +228,7 @@ function HistoryModal({ open, onClose, onResume, activeCwd }) {
 
                   {s.message_count > 0 && (
                     <span className="chip muted mono" style={{ fontSize: "var(--d-text-xs)", padding: "1px 6px" }}>
-                      {s.message_count} {s.message_count === 1 ? "turn" : "turns"}
+                      {tr(s.message_count === 1 ? "{n} turn" : "{n} turns", { n: s.message_count })}
                     </span>
                   )}
 
@@ -249,7 +249,7 @@ function HistoryModal({ open, onClose, onResume, activeCwd }) {
                       onResume?.(s);
                       onClose();
                     }}>
-                    Resume ↵
+                    {tr("Resume ↵")}
                   </button>
                 </div>
 
@@ -271,9 +271,9 @@ function HistoryModal({ open, onClose, onResume, activeCwd }) {
 
         {/* Footer */}
         <div className="bridge-foot mono" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span className="kbd">↑↓</span> navigate
-          <span className="kbd">↵</span> resume
-          <span className="kbd">esc</span> close
+          <span className="kbd">↑↓</span> {tr("navigate")}
+          <span className="kbd">↵</span> {tr("resume")}
+          <span className="kbd">esc</span> {tr("close")}
           <div style={{ flex: 1 }} />
           <span style={{ color: "var(--fg-4)" }}>~/.omp/agent/sessions</span>
         </div>

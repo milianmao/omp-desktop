@@ -15,6 +15,7 @@
 // Exposes `window.OMP_GOAL`; IIFE per the project rule for plain <script>
 // tags. Regression: test-goal.mjs.
 (function () {
+  const { tr } = window.OMP_I18N;
   const STATUSES = new Set(["active", "paused", "budget-limited", "complete", "dropped"]);
 
   const UNKNOWN = Object.freeze({ known: false, goal: null });
@@ -188,10 +189,10 @@
   /** `51 s`, `2 min 5 s`, `1 h 3 min`. */
   function fmtSeconds(seconds) {
     const s = count(seconds);
-    if (s < 60) return `${s} s`;
-    if (s < 3600) return s % 60 ? `${Math.floor(s / 60)} min ${s % 60} s` : `${s / 60} min`;
+    if (s < 60) return tr("{n} s", { n: s });
+    if (s < 3600) return s % 60 ? tr("{m} min {s} s", { m: Math.floor(s / 60), s: s % 60 }) : tr("{m} min", { m: s / 60 });
     const m = Math.floor((s % 3600) / 60);
-    return m ? `${Math.floor(s / 3600)} h ${m} min` : `${s / 3600} h`;
+    return m ? tr("{h} h {m} min", { h: Math.floor(s / 3600), m }) : tr("{h} h", { h: s / 3600 });
   }
 
   // ── Token budget ────────────────────────────────────────────────────
@@ -239,9 +240,9 @@
     const status = tabGoal?.goal?.status;
     return {
       mode,
-      goalBlocked: planMode ? "Exit plan mode first: omp does not start a goal in plan mode."
-        : open ? "This tab already has a goal. Drop it, or let it complete, to start another." : "",
-      planBlocked: mode || open ? "Plan mode is off while this tab has a goal." : "",
+      goalBlocked: planMode ? tr("Exit plan mode first: omp does not start a goal in plan mode.")
+        : open ? tr("This tab already has a goal. Drop it, or let it complete, to start another.") : "",
+      planBlocked: mode || open ? tr("Plan mode is off while this tab has a goal.") : "",
       tint: mode || status === "active" || status === "budget-limited",
     };
   }
@@ -267,16 +268,16 @@
       time: fmtSeconds(g.timeUsedSeconds),
     };
     let sub = null;
-    if (g.status === "paused" && g.pausedBy === "stop") sub = "you stopped the turn";
-    else if (g.status === "budget-limited") sub = busy ? "wrapping up" : "budget used up";
+    if (g.status === "paused" && g.pausedBy === "stop") sub = tr("you stopped the turn");
+    else if (g.status === "budget-limited") sub = busy ? tr("wrapping up") : tr("budget used up");
     let waiting = null;
     if (g.status === "active" && !busy) {
-      waiting = continuation === true ? "stopped" : continuation === false ? "off" : "unknown";
+      waiting = continuation === true ? tr("stopped") : continuation === false ? tr("off") : tr("unknown");
     }
     const actions = g.status === "complete" ? ["dismiss"]
       : g.status === "paused" ? ["resume", "drop"]
       : ["pause", "drop"];
-    return { tone: TONES[g.status], chip: CHIPS[g.status], objective: g.objective, sub, meter, waiting, actions };
+    return { tone: TONES[g.status], chip: tr(CHIPS[g.status]), objective: g.objective, sub, meter, waiting, actions };
   }
 
   /** What a goal row in the transcript shows (`rowFor`'s rows, plus the
@@ -289,21 +290,21 @@
     const withTime = chips => (time ? [...chips, time] : chips);
     switch (row.event) {
       case "set":
-        return { tone: "active", title: "goal set", detail: row.objective, chips: [budget ? `budget ${budget}` : "no budget"] };
+        return { tone: "active", title: tr("goal set"), detail: row.objective, chips: [budget ? tr("budget {budget}", { budget }) : tr("no budget")] };
       case "paused":
-        return { tone: "paused", title: "goal paused", detail: row.cause === "stop" ? "you stopped the turn" : null, chips: withTime([`${used} tokens`]) };
+        return { tone: "paused", title: tr("goal paused"), detail: row.cause === "stop" ? tr("you stopped the turn") : null, chips: withTime([tr("{n} tokens", { n: used })]) };
       case "resumed":
-        return { tone: "active", title: "goal resumed", detail: row.objective, chips: [`${used} tokens`] };
+        return { tone: "active", title: tr("goal resumed"), detail: row.objective, chips: [tr("{n} tokens", { n: used })] };
       case "limit":
-        return { tone: "limit", title: "budget reached", detail: "omp asked the agent to wrap up", chips: [`${used} / ${budget ?? "?"} tokens`] };
+        return { tone: "limit", title: tr("budget reached"), detail: tr("omp asked the agent to wrap up"), chips: [tr("{used} / {budget} tokens", { used, budget: budget ?? "?" })] };
       case "complete":
-        return { tone: "done", title: "goal complete", detail: row.objective, chips: withTime([budget ? `${used} of ${budget} tokens` : `${used} tokens`]) };
+        return { tone: "done", title: tr("goal complete"), detail: row.objective, chips: withTime([budget ? tr("{used} of {budget} tokens", { used, budget }) : tr("{n} tokens", { n: used })]) };
       case "dropped":
-        return { tone: "paused", title: "goal dropped", detail: row.objective, chips: withTime([`${used} tokens`]) };
+        return { tone: "paused", title: tr("goal dropped"), detail: row.objective, chips: withTime([tr("{n} tokens", { n: used })]) };
       case "continue":
-        return { tone: "active", title: "continuing toward the goal", detail: null, chips: [] };
+        return { tone: "active", title: tr("continuing toward the goal"), detail: null, chips: [] };
       default:
-        return { tone: "paused", title: "goal", detail: null, chips: [] };
+        return { tone: "paused", title: tr("goal"), detail: null, chips: [] };
     }
   }
 

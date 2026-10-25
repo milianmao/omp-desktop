@@ -23,7 +23,7 @@ Code: `src/app/settings-schema.js` (`window.OMP_SETTINGS`), `src/app/settings-ta
 
 | What | Where |
 |---|---|
-| tweak rows, `widget:*` toggles, column widths, `terminalHeight`, `skippedUpdate` | `localStorage` `omp-desktop:tweaks` via `useTweaks` (`design/tweaks/use-tweaks.js`); `OMP_TWEAKS_STORE.read()` for code that runs before React (`live.js` at load) |
+| tweak rows, `lang`, `widget:*` toggles, column widths, `terminalHeight`, `skippedUpdate` | `localStorage` `omp-desktop:tweaks` via `useTweaks` (`design/tweaks/use-tweaks.js`); `OMP_TWEAKS_STORE.read()` for code that runs before React (`live.js` at load) |
 | shell | `<app config>/terminal.json` (`terminal.md`) |
 | Chromium | `<app config>/browser.json` (`browser.md`) |
 | approval mode default + project overrides | `<app config>/approval-mode.json` (`approval-mode.md`) |

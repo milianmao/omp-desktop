@@ -74,8 +74,8 @@ function ThinkingMenu({ model, level, cycleHint, onLoad, onSet }) {
       if (pending.current !== token) return;
       pending.current = null;
       setBusy(false);
-      setError(e?.timedOut ? "omp has not answered yet; the level may still change"
-        : `not applied: ${e?.message ?? e}`);
+      setError(e?.timedOut ? tr("omp has not answered yet; the level may still change")
+        : tr("not applied: {msg}", { msg: e?.message ?? e }));
       return;
     }
     if (pending.current === token) close();
@@ -84,19 +84,19 @@ function ThinkingMenu({ model, level, cycleHint, onLoad, onSet }) {
   return (
     <div className="thinking-menu" ref={rootRef}>
       <button ref={triggerRef} className="composer-pill" aria-haspopup="menu" aria-expanded={open}
-        title={cycleHint ? `thinking level (${cycleHint} cycles)` : "thinking level"}
+        title={cycleHint ? tr("thinking level ({hint} cycles)", { hint: cycleHint }) : tr("thinking level")}
         onClick={() => (open ? close() : setOpen(true))}>
         <_TM_Icon name="thinking" size={11} color="var(--lilac)" />
-        <span style={{ color: "var(--fg-2)" }}>thinking · {level}</span>
+        <span style={{ color: "var(--fg-2)" }}>{tr("thinking · {level}", { level })}</span>
         <_TM_Icon name="chev" size={10} color="var(--fg-4)" />
       </button>
       {open && (
-        <div ref={popRef} className={`thinking-pop${busy ? " busy" : ""}`} role="menu" aria-label="thinking level" onKeyDown={onPopKey}>
-          <div className="thinking-pop-head mono" role="none">thinking · {model?.name}</div>
+        <div ref={popRef} className={`thinking-pop${busy ? " busy" : ""}`} role="menu" aria-label={tr("thinking level")} onKeyDown={onPopKey}>
+          <div className="thinking-pop-head mono" role="none">{tr("thinking · {model}", { model: model?.name })}</div>
           {!shown ? (
-            <div className="thinking-pop-note" role="none">loading…</div>
+            <div className="thinking-pop-note" role="none">{tr("loading…")}</div>
           ) : shown.error ? (
-            <div className="thinking-pop-note error" role="none">could not load the levels: {shown.error}</div>
+            <div className="thinking-pop-note error" role="none">{tr("could not load the levels: {err}", { err: shown.error })}</div>
           ) : (<>
             {shown.levels.map(l => (
               <button key={l} className={`thinking-item${l === level ? " active" : ""}`}
@@ -110,11 +110,11 @@ function ThinkingMenu({ model, level, cycleHint, onLoad, onSet }) {
               </button>
             ))}
             {shown.levels.length <= 1 && (
-              <div className="thinking-pop-note" role="none">this model has no thinking levels</div>
+              <div className="thinking-pop-note" role="none">{tr("this model has no thinking levels")}</div>
             )}
           </>)}
           {error && <div className="thinking-pop-note error" role="none">{error}</div>}
-          {cycleHint && <div className="thinking-pop-foot mono" role="none">{cycleHint} cycles the level</div>}
+          {cycleHint && <div className="thinking-pop-foot mono" role="none">{cycleHint} {tr("cycles the level")}</div>}
         </div>
       )}
     </div>

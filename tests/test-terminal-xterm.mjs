@@ -45,6 +45,10 @@ const win = {
   },
   OMP_KEYMAP: { guestShouldBypass: (e) => e.key === "bypass" },
 };
+// i18n.js first: terminal-xterm destructures OMP_I18N.tr at load (the en
+// path is the identity, so the assertions below are unchanged).
+// eslint-disable-next-line no-new-func
+new Function("window", readFileSync(join(root, "src/app/i18n.js"), "utf8"))(win);
 // eslint-disable-next-line no-new-func
 new Function("window", readFileSync(join(root, "src/app/terminal-xterm.js"), "utf8"))(win);
 const X = win.OMP_TERMINAL_XTERM;

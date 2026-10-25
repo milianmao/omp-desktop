@@ -20,13 +20,13 @@ function _GS_Switch({ cont }) {
   const known = cont.value !== null;
   // Unknown: still loading ("…"), or omp could not be asked ("?"; the
   // reason shows in the strip's error line).
-  const label = known ? (on ? "on" : "off") : cont.error ? "?" : "…";
+  const label = known ? (on ? tr("on") : tr("off")) : cont.error ? "?" : "…";
   return (
     <button type="button" className="goal-switch" role="switch" aria-checked={on}
       disabled={cont.busy || !known}
-      title="omp's goal.continuationModes setting for this profile. On: omp keeps working on an active goal between turns by itself."
+      title={tr("omp's goal.continuationModes setting for this profile. On: omp keeps working on an active goal between turns by itself.")}
       onClick={() => cont.set(!on)}>
-      auto-continue <span className={`goal-toggle${on ? " on" : ""}`} /> {label}
+      {tr("auto-continue")} <span className={`goal-toggle${on ? " on" : ""}`} /> {label}
     </button>
   );
 }
@@ -45,19 +45,19 @@ function _GS_Budget({ budget, onBudget }) {
   };
   return (
     <>
-      <span className="goal-budget-label">token budget</span>
-      <button type="button" className={`goal-opt${budget == null ? " on" : ""}`} aria-pressed={budget == null} onClick={() => onBudget(null)}>no limit</button>
+      <span className="goal-budget-label">{tr("token budget")}</span>
+      <button type="button" className={`goal-opt${budget == null ? " on" : ""}`} aria-pressed={budget == null} onClick={() => onBudget(null)}>{tr("no limit")}</button>
       {_GS_PRESETS.map(n => (
         <button type="button" key={n} className={`goal-opt${budget === n ? " on" : ""}`} aria-pressed={budget === n} onClick={() => onBudget(n)}>{_GS_budgetLabel(n)}</button>
       ))}
       {custom === null ? (
         <button type="button" className={`goal-opt${preset ? "" : " on"}`} aria-pressed={!preset}
           onClick={() => { setCustom(preset ? "" : String(budget)); setBad(false); }}>
-          {preset ? "custom…" : _GS_budgetLabel(budget)}
+          {preset ? tr("custom…") : _GS_budgetLabel(budget)}
         </button>
       ) : (
-        <input className={`goal-budget-input mono${bad ? " bad" : ""}`} autoFocus value={custom} placeholder="e.g. 300k"
-          aria-label="custom token budget"
+        <input className={`goal-budget-input mono${bad ? " bad" : ""}`} autoFocus value={custom} placeholder={tr("e.g. 300k")}
+          aria-label={tr("custom token budget")}
           onChange={e => { setCustom(e.target.value); setBad(false); }}
           onKeyDown={e => {
             if (e.key === "Enter") { e.preventDefault(); commit(); }
@@ -68,7 +68,7 @@ function _GS_Budget({ budget, onBudget }) {
           // its own button.
           onBlur={() => { if (custom.trim()) commit(); else { setCustom(null); setBad(false); } }} />
       )}
-      {bad && <span className="goal-error-inline">a whole number of tokens, like 300k</span>}
+      {bad && <span className="goal-error-inline">{tr("a whole number of tokens, like 300k")}</span>}
     </>
   );
 }
@@ -78,10 +78,10 @@ function _GS_Draft({ draft, cont, onExit, onBudget }) {
     <div className="goal-strip">
       <div className="goal-head">
         <_GS_Icon name="goal" size={12} color="var(--lilac)" />
-        <span className="goal-name">goal mode</span>
-        <span className="goal-sub">· your message becomes the goal; the agent works toward it until it calls it done</span>
+        <span className="goal-name">{tr("goal mode")}</span>
+        <span className="goal-sub">{tr("· your message becomes the goal; the agent works toward it until it calls it done")}</span>
         <div className="goal-spacer" />
-        <button type="button" className="btn ghost" onClick={onExit}>exit</button>
+        <button type="button" className="btn ghost" onClick={onExit}>{tr("exit")}</button>
       </div>
       <div className="goal-line goal-budget">
         <_GS_Budget budget={draft.budget} onBudget={onBudget} />
@@ -117,7 +117,7 @@ function _GS_Status({ bridge, tabGoal, busy, cont }) {
     const res = await bridge.goalOp(op);
     setPending(null);
     if (op === "drop") setConfirmDrop(false);
-    if (!res?.ok) setError(res?.error ?? `could not ${op} the goal`);
+    if (!res?.ok) setError(res?.error ?? tr("could not {op} the goal", { op }));
   };
   const act = a => {
     if (a === "dismiss") bridge.goalDismiss();
@@ -130,7 +130,7 @@ function _GS_Status({ bridge, tabGoal, busy, cont }) {
     <div className="goal-strip">
       <div className="goal-head">
         <_GS_Icon name="goal" size={12} color="var(--lilac)" />
-        <span className="goal-name">goal</span>
+        <span className="goal-name">{tr("goal")}</span>
         <span className={`goal-chip ${view.tone}`}>{view.chip}</span>
         <span className="goal-obj selectable" title={view.objective}>{view.objective}</span>
         {view.sub && <span className="goal-sub">· {view.sub}</span>}
@@ -146,30 +146,30 @@ function _GS_Status({ bridge, tabGoal, busy, cont }) {
       <div className="goal-meter">
         {meter.pct != null && <div className={`goal-bar ${view.tone}`}><span style={{ width: `${meter.pct}%` }} /></div>}
         <span>
-          {meter.used}{meter.budget ? ` / ${meter.budget} tokens` : " tokens · no budget"}
-          {meter.left ? ` · ${meter.left} left` : ""}
-          {meter.over ? ` · ${meter.over} over budget` : ""}
+          {meter.used}{meter.budget ? tr(" / {n} tokens", { n: meter.budget }) : tr(" tokens · no budget")}
+          {meter.left ? tr(" · {n} left", { n: meter.left }) : ""}
+          {meter.over ? tr(" · {n} over budget", { n: meter.over }) : ""}
         </span>
         <span>· {meter.time}</span>
         {view.tone !== "done" && !switchInWaiting && <><div className="goal-spacer" /><_GS_Switch cont={cont} /></>}
       </div>
       {view.waiting && (
         <div className="goal-line">
-          <span className="goal-note"><b>Waiting for your next message.</b> {_GS_WAITING[view.waiting]}</span>
+          <span className="goal-note"><b>{tr("Waiting for your next message.")}</b> {tr(_GS_WAITING[view.waiting])}</span>
           {switchInWaiting && <_GS_Switch cont={cont} />}
           {switchInWaiting && (
             <button type="button" className="btn outlined goal-resume" disabled={cont.busy || cont.value === null}
-              onClick={() => cont.set(true)}>turn on</button>
+              onClick={() => cont.set(true)}>{tr("turn on")}</button>
           )}
         </div>
       )}
       {confirmDrop && (
         <div className="goal-line">
-          <span className="goal-note">Drop this goal? Its token usage stays in the session log.</span>
+          <span className="goal-note">{tr("Drop this goal? Its token usage stays in the session log.")}</span>
           <button type="button" className="btn outlined goal-drop" disabled={pending !== null} onClick={() => run("drop")}>
-            {pending === "drop" ? "dropping…" : "drop goal"}
+            {pending === "drop" ? tr("dropping…") : tr("drop goal")}
           </button>
-          <button type="button" className="btn ghost" disabled={pending !== null} onClick={() => setConfirmDrop(false)}>keep</button>
+          <button type="button" className="btn ghost" disabled={pending !== null} onClick={() => setConfirmDrop(false)}>{tr("keep")}</button>
         </div>
       )}
       {(error || cont.error) && <div className="goal-error">{error ?? cont.error}</div>}

@@ -13,10 +13,10 @@ const TREE_OPEN_TITLE =
 
 function treeNowDesc(row) {
   const t = _TD_Fmt.tokens;
-  if (_TD_isLive(row.state)) return `reads ${t(row.readTokens)} cached tokens`;
-  if (row.state === "partial") return `reads ${t(row.readTokens)}, writes ${t(row.writeTokens)} tokens`;
-  if (row.state === "cold") return `writes ${t(row.writeTokens)} tokens`;
-  return `${t(row.prefixTokens)} tokens of context · cache lifetime unknown`;
+  if (_TD_isLive(row.state)) return tr("reads {n} cached tokens", { n: t(row.readTokens) });
+  if (row.state === "partial") return tr("reads {read}, writes {write} tokens", { read: t(row.readTokens), write: t(row.writeTokens) });
+  if (row.state === "cold") return tr("writes {n} tokens", { n: t(row.writeTokens) });
+  return tr("{n} tokens of context · cache lifetime unknown", { n: t(row.prefixTokens) });
 }
 
 function TreeCompare({ row, now }) {
@@ -26,16 +26,16 @@ function TreeCompare({ row, now }) {
   return (
     <div className="tree-compare">
       <div className="cmp now">
-        <div className="cmp-k">re-ask now</div>
+        <div className="cmp-k">{tr("re-ask now")}</div>
         <div className="cmp-v">{nowValue}</div>
         <div className="cmp-d">{treeNowDesc(row)}</div>
       </div>
       {later && (<>
-        <div className="cmp-arrow">after {F.when(row.until, now)} →</div>
+        <div className="cmp-arrow">{tr("after {when} →", { when: F.when(row.until, now) })}</div>
         <div className="cmp later">
-          <div className="cmp-k">in {F.dur(row.until - now)}</div>
+          <div className="cmp-k">{tr("in {dur}", { dur: F.dur(row.until - now) })}</div>
           <div className="cmp-v">{F.price(row.coldPrice)}</div>
-          <div className="cmp-d">writes {F.tokens(row.coldWriteTokens)} tokens again</div>
+          <div className="cmp-d">{tr("writes {n} tokens again", { n: F.tokens(row.coldWriteTokens) })}</div>
         </div>
       </>)}
     </div>
@@ -53,8 +53,8 @@ function TreeDetail({ row, tips, now, since, streaming, onBranch, onFork, onOpen
     setError(null);
     try {
       const res = await action();
-      if (res?.cancelled) setError("Cancelled by omp.");
-      else if (res && res.ok === false) setError(res.error || "omp refused the request.");
+      if (res?.cancelled) setError(tr("Cancelled by omp."));
+      else if (res && res.ok === false) setError(res.error || tr("omp refused the request."));
     } catch (e) {
       setError(String(e?.message ?? e));
     } finally {
@@ -63,7 +63,7 @@ function TreeDetail({ row, tips, now, since, streaming, onBranch, onFork, onOpen
   };
 
   const blocked = busy || streaming;
-  const wait = streaming ? "Wait for the current turn to finish." : undefined;
+  const wait = streaming ? tr("Wait for the current turn to finish.") : undefined;
   // A new process rebuilds the system prompt, so opening is priced as the
   // whole conversation of the file's tip written again (its cold price).
   const fileTip = row.openFile ? tips.find(t => t.file === row.openFile) : null;
@@ -73,29 +73,29 @@ function TreeDetail({ row, tips, now, since, streaming, onBranch, onFork, onOpen
   return (
     <div className={`tree-detail s-${row.state}`}>
       <div className="tree-detail-title">
-        Re-ask “{title}” <span className="tree-time mono">{F.when(row.ts, now)}</span>
+        {tr("Re-ask “{title}”", { title })}{" "}<span className="tree-time mono">{F.when(row.ts, now)}</span>
       </div>
       <TreeCompare row={row} now={now} />
       {row.staleProcess && <div className="tree-note">{F.staleNote(since, now)}</div>}
       <div className="tree-actions">
         {row.inCurrent && (
           <button className="btn primary" disabled={blocked}
-            title={wait ?? "Start a new session before this prompt and put the prompt back in the composer."}
+            title={wait ?? tr("Start a new session before this prompt and put the prompt back in the composer.")}
             onClick={() => run(() => onBranch(row.id))}>
-            <_TD_Icon name="branch" size={11} /> Branch here
+            <_TD_Icon name="branch" size={11} /> {tr("Branch here")}
           </button>
         )}
         {row.inCurrent && row.forkEntryId && (
           <button className="btn outlined" disabled={blocked}
-            title={wait ?? "Continue in a new session file that keeps this prompt and its reply."}
+            title={wait ?? tr("Continue in a new session file that keeps this prompt and its reply.")}
             onClick={() => run(() => onFork(row.forkEntryId))}>
-            Fork after the reply
+            {tr("Fork after the reply")}
           </button>
         )}
         {row.openFile && (
-          <button className="btn outlined" disabled={busy} title={TREE_OPEN_TITLE}
+          <button className="btn outlined" disabled={busy} title={tr(TREE_OPEN_TITLE)}
             onClick={() => run(() => onOpenFile(row.openFile))}>
-            Open in new tab{openPrice ? ` · cold ${openPrice}` : ""}
+            {openPrice ? tr("Open in new tab · cold {price}", { price: openPrice }) : tr("Open in new tab")}
           </button>
         )}
       </div>

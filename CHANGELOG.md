@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Settings → Appearance → Language row (English / 简体中文, live switching without a restart, `auto` follows the system language, choice persists) — whole-desktop-UI translation layer (English string = key; untranslated strings degrade to English); phone remote page and Rust-side strings stay English this round.
+
 ## [0.12.1] - 2026-10-21
 
 ### Added

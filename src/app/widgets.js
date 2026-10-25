@@ -14,6 +14,7 @@
 // matching, approval, scheduling) lives in Rust (src-tauri/src/widgets/);
 // every output-schema rule lives here so tests/test-widgets.mjs covers it.
 (function () {
+  const { tr } = window.OMP_I18N;
   const VERSION = 1;
   const LIMITS = { blocks: 32, items: 50, rows: 50, short: 200, long: 2000 };
   const TONES = new Set(["ok", "warn", "error", "neutral", "info"]);
@@ -104,12 +105,12 @@
   function parseOutput(stdout) {
     let doc;
     try { doc = JSON.parse(stdout); } catch {
-      return { ok: false, error: "stdout is not JSON" };
+      return { ok: false, error: tr("stdout is not JSON") };
     }
-    if (!doc || typeof doc !== "object" || Array.isArray(doc)) return { ok: false, error: "stdout is not a JSON object" };
-    if (typeof doc.version !== "number") return { ok: false, error: `plugin reports an invalid version, this desktop supports ${VERSION}` };
-    if (doc.version !== VERSION) return { ok: false, error: `plugin reports version ${doc.version}, this desktop supports ${VERSION}` };
-    if (!Array.isArray(doc.blocks)) return { ok: false, error: "output has no \"blocks\" array" };
+    if (!doc || typeof doc !== "object" || Array.isArray(doc)) return { ok: false, error: tr("stdout is not a JSON object") };
+    if (typeof doc.version !== "number") return { ok: false, error: tr("plugin reports an invalid version, this desktop supports {supported}", { supported: VERSION }) };
+    if (doc.version !== VERSION) return { ok: false, error: tr("plugin reports version {reported}, this desktop supports {supported}", { reported: doc.version, supported: VERSION }) };
+    if (!Array.isArray(doc.blocks)) return { ok: false, error: tr("output has no \"blocks\" array") };
     let skipped = 0;
     const blocks = [];
     for (const raw of doc.blocks.slice(0, LIMITS.blocks)) {
@@ -267,7 +268,7 @@
   function cardRun(run, parsed) {
     const last = run?.last ?? null;
     const base = { durationMs: last?.durationMs ?? null, at: last?.at ?? null, lastOkAt: run?.lastOkAt ?? null };
-    const result = !last ? null : last.error != null ? { ok: false, error: last.error } : parsed ?? { ok: false, error: "plugin printed no output" };
+    const result = !last ? null : last.error != null ? { ok: false, error: last.error } : parsed ?? { ok: false, error: tr("plugin printed no output") };
     if (run && (run.phase === "running" || run.phase === "waiting")) {
       return { state: "running", widget: result?.ok ? result.widget : null, error: null, ...base };
     }

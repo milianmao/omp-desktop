@@ -58,22 +58,22 @@ function UpdateModal({ updater, busyTabs }) {
       <div className="update-panel" ref={panelRef} tabIndex={-1} onClick={e => e.stopPropagation()}>
         <div className="update-head">
           <_UpdIcon name="arrowUp" size={13} color="var(--accent)" />
-          <span className="mono" style={{ color: "var(--fg-2)" }}>updates · OMP Desktop {version ? `v${version}` : ""}</span>
-          <button className="btn icon ghost" style={{ marginLeft: "auto" }} title="check again"
+          <span className="mono" style={{ color: "var(--fg-2)" }}>{tr("updates · OMP Desktop {v}", { v: version ? `v${version}` : "" })}</span>
+          <button className="btn icon ghost" style={{ marginLeft: "auto" }} title={tr("check again")}
             onClick={updater.check} disabled={U.isBusy(state)}>
             <_UpdIcon name="refresh" size={11} />
           </button>
           {!inFlight && (
-            <button className="btn icon ghost" onClick={close} title="close">
+            <button className="btn icon ghost" onClick={close} title={tr("close")}>
               <_UpdIcon name="close" size={11} />
             </button>
           )}
         </div>
 
         <div className="update-body">
-          {phase === "idle" && <div className="panel-empty mono">not checked yet</div>}
-          {phase === "checking" && !update && <div className="panel-empty mono">checking for updates…</div>}
-          {phase === "uptodate" && <div className="panel-empty mono">you're on the latest version</div>}
+          {phase === "idle" && <div className="panel-empty mono">{tr("not checked yet")}</div>}
+          {phase === "checking" && !update && <div className="panel-empty mono">{tr("checking for updates…")}</div>}
+          {phase === "uptodate" && <div className="panel-empty mono">{tr("you're on the latest version")}</div>}
           {phase === "error" && <div className="panel-empty mono update-error">{error}</div>}
 
           {update && (
@@ -81,21 +81,21 @@ function UpdateModal({ updater, busyTabs }) {
               <div className="update-title">
                 <span className="mono" style={{ color: "var(--accent)" }}>v{update.version}</span>
                 <span className="mono" style={{ color: "var(--fg-4)" }}>
-                  available{update.date ? ` · ${update.date.slice(0, 10)}` : ""}
+                  {tr("available")}{update.date ? ` · ${update.date.slice(0, 10)}` : ""}
                 </span>
               </div>
               {update.notes && <pre className="update-notes selectable">{update.notes}</pre>}
               {error && <div className="update-error mono">{error}</div>}
               {!update.canInstall && (
                 <div className="update-hint mono">
-                  This installation is managed outside the app (system package or source build) —
-                  download the new version from the release page.
+                  {tr("This installation is managed outside the app (system package or source build) — download the new version from the release page.")}
                 </div>
               )}
               {update.canInstall && busyTabs > 0 && !inFlight && (
                 <div className="update-hint mono">
-                  {busyTabs === 1 ? "1 tab is" : `${busyTabs} tabs are`} still working — restarting interrupts
-                  {busyTabs === 1 ? " it" : " them"} (unfinished turns and background jobs are lost).
+                  {busyTabs === 1
+                    ? tr("1 tab is still working — restarting interrupts it (unfinished turns and background jobs are lost).")
+                    : tr("{n} tabs are still working — restarting interrupts them (unfinished turns and background jobs are lost).", { n: busyTabs })}
                 </div>
               )}
               {inFlight && (
@@ -107,7 +107,7 @@ function UpdateModal({ updater, busyTabs }) {
                   </span>
                   <span className="mono" style={{ color: "var(--fg-3)" }}>
                     {phase === "restarting"
-                      ? "restarting…"
+                      ? tr("restarting…")
                       : `${U.formatBytes(progress?.downloaded ?? 0)}${progress?.total ? ` / ${U.formatBytes(progress.total)}` : ""}`}
                   </span>
                 </div>
@@ -118,21 +118,21 @@ function UpdateModal({ updater, busyTabs }) {
 
         {update && !inFlight && (
           <div className="update-foot">
-            <button className="btn ghost" onClick={updater.skip} title="hide the notice until a newer version">skip this version</button>
+            <button className="btn ghost" onClick={updater.skip} title={tr("hide the notice until a newer version")}>{tr("skip this version")}</button>
             <div style={{ flex: 1 }} />
-            <button className="btn ghost" onClick={close}>later</button>
+            <button className="btn ghost" onClick={close}>{tr("later")}</button>
             {update.canInstall ? (
               <>
                 <button className="btn outlined" onClick={updater.openRelease}>
-                  <_UpdIcon name="external" size={11} /> release page
+              <_UpdIcon name="external" size={11} /> {tr("release page")}
                 </button>
                 <button className="btn primary" onClick={updater.install} disabled={!U.canStartInstall(state)}>
-                  install &amp; restart
+                  {tr("install & restart")}
                 </button>
               </>
             ) : (
               <button className="btn primary" onClick={updater.openRelease}>
-                <_UpdIcon name="external" size={11} /> open release page
+                <_UpdIcon name="external" size={11} /> {tr("open release page")}
               </button>
             )}
           </div>
