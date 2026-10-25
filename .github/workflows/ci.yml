@@ -1,4 +1,5 @@
-# CI — runs the shared test suite (tests.yml) on every push and PR.
+# CI — runs the shared test suite (tests.yml) on every push and PR, and on
+# manual dispatch.
 # No bundle build here — that lives in release.yml.
 
 name: CI
@@ -17,6 +18,7 @@ on:
       - '.github/workflows/tests.yml'
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 jobs:
   test:
